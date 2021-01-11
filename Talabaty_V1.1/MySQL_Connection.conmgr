@@ -1,0 +1,14 @@
+﻿<?xml version="1.0"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:ObjectName="MySQL_Connection"
+  DTS:DTSID="{0D9DE27E-6634-4712-AAC5-DB3DD3C45B3F}"
+  DTS:CreationName="ADO.NET:MySql.Data.MySqlClient.MySqlConnection, MySql.Data, Version=8.0.21.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager
+      DTS:ConnectionString="server=197.45.4.179;user id=root;port=3306;database=talabaty;">
+      <DTS:Password
+        DTS:Name="password"
+        Sensitive="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAASmygH36NCEyRrKtauhDkxAAAAAACAAAAAAAQZgAAAAEAACAAAADCWMt/Cij0eHP4OKOeVJJ0sT4iOFI1MyATB6vLBeITXAAAAAAOgAAAAAIAACAAAABZ3vh87zXAxLyJh5GWbinqevyAk8XHMUkkOHFx2kBV/oAAAADfDJjLSH3hLToyQI03Riy6e+W5Irvg4T/3G1VM22M0DcduSWkrZpP32mV7ebzufi+R5DH20LXkWjeTRs5ZEnbbVm/LwkvappySc4RnR+7osyRxyZ8aHkCqEEURck42WEhIwQeDb+JGU/IyZvmJDN9hMth+vdiyo/WrIj4lqSVXj0AAAADMb/4X1LZrTucRtYiMc6jZ38FxaKps6sOoO608GaxakrNGh2jFox61QR0iRD79qhKDQG1YovBeIb+OssDwZdMM</DTS:Password>
+    </DTS:ConnectionManager>
+  </DTS:ObjectData>
+</DTS:ConnectionManager>

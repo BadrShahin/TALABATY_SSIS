@@ -1,0 +1,1 @@
+id,created_at,is_deleted,updated_at,device_id,email,name,password,phone,role_id,img,ErrorCode,ErrorColumn

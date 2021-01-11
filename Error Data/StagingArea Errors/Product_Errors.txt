@@ -1,0 +1,1 @@
+id,created_at,is_deleted,updated_at,preparation_time,img,title,category_id,ErrorCode,ErrorColumn

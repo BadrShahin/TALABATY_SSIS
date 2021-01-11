@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1022
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{159641D6-6404-4A2A-AE62-294DE0FE8301}") = "Talabaty_V1.1", "Talabaty_V1.1\Talabaty_V1.1.dtproj", "{7A3EE092-9647-454A-98E5-3C23837DDBA4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Development|Default = Development|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7A3EE092-9647-454A-98E5-3C23837DDBA4}.Development|Default.ActiveCfg = Development
+		{7A3EE092-9647-454A-98E5-3C23837DDBA4}.Development|Default.Build.0 = Development
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BEED1CE8-5FEA-44A2-B0C4-60FB7085F0B0}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:ObjectName="DB_Talabaty_Production_Connection"
+  DTS:DTSID="{5CB5B301-F244-4B7A-81A5-D46A93F98AD6}"
+  DTS:CreationName="OLEDB">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager
+      DTS:ConnectionString="Data Source=.;User ID=sa;Initial Catalog=DB_Talabaty_Production;Provider=SQLNCLI11.1;Persist Security Info=True;Auto Translate=False;">
+      <DTS:Password
+        DTS:Name="Password"
+        Sensitive="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAaIAfppgJv0yzadRJMCVLcAAAAAACAAAAAAAQZgAAAAEAACAAAAAI+QKnhKgYtWK4VRg5EEoz3sODf5c9yAXVZuKWfP/xJAAAAAAOgAAAAAIAACAAAABui/kML2tSxzRKubcoj9iPaZxgU4pF24k1KokxuN+MRIAAAADHkfrJ51fwn3K/KD1tmu1LjqcynmLxljVlu/qeiOuN8oI/7E2FRLSFNfbhcd5Y6CYhY6D7TH+SfMvk9hjcpA7pd+vMURLBGXPHkxpoMLXMWJCgV31tMF2ThhpIS+Yl8lWvDVAkDdF6FSSfgvIPacFcw730paL8leysCkO14/35eEAAAAAGgwZYg1s97Fjzv5dRVd+moFREpFCnmOW6UfHjIWgkYfj1u4tKyCVWb2P0ozHhorO6d8a0rxuJbl/+us7snkU+</DTS:Password>
+    </DTS:ConnectionManager>
+  </DTS:ObjectData>
+</DTS:ConnectionManager>
