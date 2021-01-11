@@ -11,8 +11,8 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="ProductionPackage"
   DTS:PackageType="5"
-  DTS:VersionBuild="114"
-  DTS:VersionGUID="{EFF65723-C099-4306-B91B-F28C48813AEC}">
+  DTS:VersionBuild="151"
+  DTS:VersionGUID="{DCFB05C2-6CA9-4637-B51E-CEF5B251B504}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -1216,7 +1216,7 @@ FROM DB_Talabaty_Production.dbo.DimCategory</property>
 			THEN 'Fourth' 
 	END AS QUARTERNAME, 
 	YEAR(Created_At) AS YEAR
-FROM DB_Talabaty_Production.dbo.FactOrders
+FROM DB_Talabaty_Production.dbo.DimOrders
 
 EXCEPT 
 
@@ -1552,13 +1552,13 @@ FROM DB_Talabaty_Production.dbo.DimDate</property>
                       cachedDataType="i4"
                       cachedName="ErrorCode"
                       externalMetadataColumnId="Package\Upload Fact Orders Data\Flat File Destination.Inputs[Flat File Destination Input].ExternalColumns[ErrorCode]"
-                      lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]" />
+                      lineageId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]" />
                     <inputColumn
                       refId="Package\Upload Fact Orders Data\Flat File Destination.Inputs[Flat File Destination Input].Columns[ErrorColumn]"
                       cachedDataType="i4"
                       cachedName="ErrorColumn"
                       externalMetadataColumnId="Package\Upload Fact Orders Data\Flat File Destination.Inputs[Flat File Destination Input].ExternalColumns[ErrorColumn]"
-                      lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]" />
+                      lineageId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]" />
                   </inputColumns>
                   <externalMetadataColumns
                     isUsed="True">
@@ -1627,48 +1627,49 @@ FROM DB_Talabaty_Production.dbo.DimDate</property>
                   dataType="System.String"
                   description="The SQL command to be executed."
                   name="SqlCommand"
-                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor, Microsoft.DataTransformationServices.Controls, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91">SELECT SUB2.Employee, SUB2.Performer, SUB2.Product, SUB2.Category, SUB2."Raw Material", SUB2.Unit, SUB2.Date, SUB2.Quantity, SUB2.Consumption, ((SUB2.Quantity * SUB2.Sell_Unit_Price )) AS 'Consumed Material Expenses'
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor, Microsoft.DataTransformationServices.Controls, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91">SELECT SUB2."Order", SUB2."Raw Material", SUB2.Employee, SUB2.Performer, SUB2.Product, SUB2.Category, SUB2.Unit, SUB2.Date, SUB2.Quantity, SUB2.Consumption, ((SUB2.Quantity * SUB2.Sell_Unit_Price )) AS 'Consumed Material Expenses'
 FROM (	
-	SELECT SUB1.Employee, SUB1.Performer, SUB1.Product, SUB1.Category, SUB1."Raw Material", SUB1.Buy_Unit_Price, SUB1.Sell_Unit_Price, SUB1.Unit, SUB1.Date, SUB1.Quantity, ((SUB1.Quantity * SUB1.Raw_Material_Unit_Number) /CAST(SUB1.Units_Number AS decimal(9,2))) AS 'Consumption'
+	SELECT SUB1."Order", SUB1.Employee, SUB1.Performer, SUB1.Product, SUB1.Category, SUB1."Raw Material", SUB1.Buy_Unit_Price, SUB1.Sell_Unit_Price, SUB1.Unit, SUB1.Date, SUB1.Quantity, ((SUB1.Quantity * SUB1.Raw_Material_Unit_Number) /CAST(SUB1.Units_Number AS decimal(9,2))) AS 'Consumption'
 	FROM (
-		SELECT U.ID AS 'Employee', Performer.ID AS 'Performer', P.ID AS 'Product', C.ID AS 'Category', RM.ID AS 'Raw Material', RM.Units_Number, RM.Buy_Unit_Price, RM.Sell_Unit_Price,
-				FPRM.Raw_Material_Unit_Number, UN.ID AS 'Unit', DD.DateKey AS 'Date', SUM(O.COUNT) AS 'Quantity'
-		FROM FactOrders O
+		SELECT DO.ID AS "Order", U.ID AS 'Employee', Performer.ID AS 'Performer', P.ID AS 'Product', C.ID AS 'Category', RM.ID AS 'Raw Material', RM.Units_Number, RM.Buy_Unit_Price, RM.Sell_Unit_Price,
+				DPRM.Raw_Material_Unit_Number, UN.ID AS 'Unit', DD.DateKey AS 'Date', SUM(DO.COUNT) AS 'Quantity'
+		FROM DimOrders DO
 		INNER JOIN DimUser U
-		ON O.Ordered_By = U.ID
+		ON DO.Ordered_By = U.ID
 		INNER JOIN DimUser Performer 
-		ON O.Accepted_By = Performer.ID
+		ON DO.Accepted_By = Performer.ID
 		INNER JOIN DimProduct P 
-		ON O.Product_Id = P.ID
+		ON DO.Product_Id = P.ID
 		INNER JOIN DimCategory C
 		ON P.Category_Id = C.ID
-		INNER JOIN FactProductRawMaterial FPRM
-		ON FPRM.Product_Id = P.ID
+		INNER JOIN DimProductRawMaterial DPRM
+		ON DPRM.Product_Id = P.ID
 		INNER JOIN DimRawMaterial RM
-		ON FPRM.Raw_Material_Id = RM.ID
+		ON DPRM.Raw_Material_Id = RM.ID
 		INNER JOIN DimUnit UN
 		ON RM.Buy_Unit_Id = UN.ID
 		INNER JOIN DimDate DD
-		ON DD.Date = CAST (O.Created_At AS DATE)
+		ON DD.Date = CAST (DO.Created_At AS DATE)
 		WHERE DD.DateKey &gt;= 122
-		GROUP BY U.ID, Performer.ID, P.ID, C.ID, RM.ID, FPRM.Raw_Material_Unit_Number, RM.Units_Number, RM.Buy_Unit_Price, RM.Sell_Unit_Price, UN.ID, DD.DateKey
+		GROUP BY DO.ID, U.ID, Performer.ID, P.ID, C.ID, RM.ID, DPRM.Raw_Material_Unit_Number, RM.Units_Number, RM.Buy_Unit_Price, RM.Sell_Unit_Price, UN.ID, DD.DateKey
 		) SUB1
-		GROUP BY SUB1.Employee, SUB1.Performer, SUB1.Product, SUB1.Category, SUB1."Raw Material", SUB1.Buy_Unit_Price, SUB1.Sell_Unit_Price, SUB1.Unit, SUB1.Date, SUB1.Quantity, SUB1.Raw_Material_Unit_Number, SUB1.Units_Number
+		GROUP BY SUB1."Order", SUB1.Employee, SUB1.Performer, SUB1.Product, SUB1.Category, SUB1."Raw Material", SUB1.Buy_Unit_Price, SUB1.Sell_Unit_Price, SUB1.Unit, SUB1.Date, SUB1.Quantity, SUB1.Raw_Material_Unit_Number, SUB1.Units_Number
 	) SUB2
 
 EXCEPT 
 
-SELECT [Employee_ID]
+SELECT [Order_id]
+      ,[RawMaterial_ID]
+,[Employee_ID]
       ,[Performer_ID]
       ,[Product_ID]
       ,[Category_ID]
-      ,[RawMaterial_ID]
       ,[Unit_ID]
       ,[Date_ID]
       ,[Quantity]
 ,[Consumption]
 ,[Expenses]
-  FROM [DB_Talabaty_Production].[dbo].[FactOrder]</property>
+  FROM [DB_Talabaty_Production].[dbo].[FactOrders]</property>
                 <property
                   dataType="System.String"
                   description="The variable that contains the SQL command to be executed."
@@ -1794,6 +1795,15 @@ SELECT [Employee_ID]
                       lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Consumed Material Expenses]"
                       name="Consumed Material Expenses"
                       truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Order]"
+                      dataType="i8"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].ExternalColumns[Order]"
+                      lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Order]"
+                      name="Order"
+                      truncationRowDisposition="FailComponent" />
                   </outputColumns>
                   <externalMetadataColumns
                     isUsed="True">
@@ -1837,6 +1847,10 @@ SELECT [Employee_ID]
                       refId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].ExternalColumns[Consumed Material Expenses]"
                       dataType="r8"
                       name="Consumed Material Expenses" />
+                    <externalMetadataColumn
+                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].ExternalColumns[Order]"
+                      dataType="i8"
+                      name="Order" />
                   </externalMetadataColumns>
                 </output>
                 <output
@@ -1844,6 +1858,11 @@ SELECT [Employee_ID]
                   isErrorOut="true"
                   name="OLE DB Source Error Output">
                   <outputColumns>
+                    <outputColumn
+                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Error Output].Columns[Order]"
+                      dataType="i8"
+                      lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Error Output].Columns[Order]"
+                      name="Order" />
                     <outputColumn
                       refId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Error Output].Columns[Employee]"
                       dataType="i8"
@@ -1912,11 +1931,11 @@ SELECT [Employee_ID]
               </outputs>
             </component>
             <component
-              refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders"
+              refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders"
               componentClassID="Microsoft.OLEDBDestination"
               contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
               description="OLE DB Destination"
-              name="Upload Fact Orders Data to Test_FactOrders"
+              name="Upload Orders Data to FactOrders"
               usesDispositions="true"
               version="4">
               <properties>
@@ -1927,7 +1946,7 @@ SELECT [Employee_ID]
                 <property
                   dataType="System.String"
                   description="Specifies the name of the database object used to open a rowset."
-                  name="OpenRowset">[dbo].[FactOrder]</property>
+                  name="OpenRowset">[dbo].[FactOrders]</property>
                 <property
                   dataType="System.String"
                   description="Specifies the variable that contains the name of the database object used to open a rowset."
@@ -1969,7 +1988,7 @@ SELECT [Employee_ID]
               </properties>
               <connections>
                 <connection
-                  refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Connections[OleDbConnection]"
+                  refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Connections[OleDbConnection]"
                   connectionManagerID="{5CB5B301-F244-4B7A-81A5-D46A93F98AD6}:external"
                   connectionManagerRefId="Project.ConnectionManagers[DB_Talabaty_Production_Connection]"
                   description="The OLE DB runtime connection used to access the database."
@@ -1977,136 +1996,146 @@ SELECT [Employee_ID]
               </connections>
               <inputs>
                 <input
-                  refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input]"
+                  refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input]"
                   errorOrTruncationOperation="Insert"
                   errorRowDisposition="RedirectRow"
                   hasSideEffects="true"
                   name="OLE DB Destination Input">
                   <inputColumns>
                     <inputColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].Columns[Quantity]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Quantity]"
                       cachedDataType="r8"
                       cachedName="Quantity"
-                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Quantity]"
+                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Quantity]"
                       lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Quantity]" />
                     <inputColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].Columns[Employee]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Employee]"
                       cachedDataType="i8"
                       cachedName="Employee"
-                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Employee_ID]"
+                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Employee_ID]"
                       lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Employee]" />
                     <inputColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].Columns[Performer]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Performer]"
                       cachedDataType="i8"
                       cachedName="Performer"
-                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Performer_ID]"
+                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Performer_ID]"
                       lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Performer]" />
                     <inputColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].Columns[Product]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Product]"
                       cachedDataType="i8"
                       cachedName="Product"
-                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Product_ID]"
+                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Product_ID]"
                       lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Product]" />
                     <inputColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].Columns[Category]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Category]"
                       cachedDataType="i8"
                       cachedName="Category"
-                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Category_ID]"
+                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Category_ID]"
                       lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Category]" />
                     <inputColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].Columns[Raw Material]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Raw Material]"
                       cachedDataType="i8"
                       cachedName="Raw Material"
-                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[RawMaterial_ID]"
+                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[RawMaterial_ID]"
                       lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Raw Material]" />
                     <inputColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].Columns[Unit]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Unit]"
                       cachedDataType="i8"
                       cachedName="Unit"
-                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Unit_ID]"
+                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Unit_ID]"
                       lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Unit]" />
                     <inputColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].Columns[Date]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Date]"
                       cachedDataType="i4"
                       cachedName="Date"
-                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Date_ID]"
+                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Date_ID]"
                       lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Date]" />
                     <inputColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].Columns[Consumption]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Consumption]"
                       cachedDataType="r8"
                       cachedName="Consumption"
-                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Consumption]"
+                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Consumption]"
                       lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Consumption]" />
                     <inputColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].Columns[Consumed Material Expenses]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Consumed Material Expenses]"
                       cachedDataType="r8"
                       cachedName="Consumed Material Expenses"
-                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Expenses]"
+                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Expenses]"
                       lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Consumed Material Expenses]" />
+                    <inputColumn
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Order]"
+                      cachedDataType="i8"
+                      cachedName="Order"
+                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Order_ID]"
+                      lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Order]" />
                   </inputColumns>
                   <externalMetadataColumns
                     isUsed="True">
                     <externalMetadataColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Employee_ID]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Employee_ID]"
                       dataType="i8"
                       name="Employee_ID" />
                     <externalMetadataColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Performer_ID]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Performer_ID]"
                       dataType="i8"
                       name="Performer_ID" />
                     <externalMetadataColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Product_ID]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Product_ID]"
                       dataType="i8"
                       name="Product_ID" />
                     <externalMetadataColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Category_ID]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Category_ID]"
                       dataType="i8"
                       name="Category_ID" />
                     <externalMetadataColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[RawMaterial_ID]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[RawMaterial_ID]"
                       dataType="i8"
                       name="RawMaterial_ID" />
                     <externalMetadataColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Unit_ID]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Unit_ID]"
                       dataType="i8"
                       name="Unit_ID" />
                     <externalMetadataColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Quantity]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Quantity]"
                       dataType="r8"
                       name="Quantity" />
                     <externalMetadataColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Date_ID]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Date_ID]"
                       dataType="i4"
                       name="Date_ID" />
                     <externalMetadataColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Consumption]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Consumption]"
                       dataType="r8"
                       name="Consumption" />
                     <externalMetadataColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Expenses]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Expenses]"
                       dataType="r8"
                       name="Expenses" />
+                    <externalMetadataColumn
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Order_ID]"
+                      dataType="i8"
+                      name="Order_ID" />
                   </externalMetadataColumns>
                 </input>
               </inputs>
               <outputs>
                 <output
-                  refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Outputs[OLE DB Destination Error Output]"
+                  refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Outputs[OLE DB Destination Error Output]"
                   exclusionGroup="1"
                   isErrorOut="true"
                   name="OLE DB Destination Error Output"
-                  synchronousInputId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input]">
+                  synchronousInputId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input]">
                   <outputColumns>
                     <outputColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
                       dataType="i4"
-                      lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      lineageId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
                       name="ErrorCode"
                       specialFlags="1" />
                     <outputColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
                       dataType="i4"
-                      lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      lineageId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
                       name="ErrorColumn"
                       specialFlags="2" />
                   </outputColumns>
@@ -2120,10 +2149,10 @@ SELECT [Employee_ID]
               refId="Package\Upload Fact Orders Data.Paths[OLE DB Destination Error Output]"
               endId="Package\Upload Fact Orders Data\Flat File Destination.Inputs[Flat File Destination Input]"
               name="OLE DB Destination Error Output"
-              startId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Outputs[OLE DB Destination Error Output]" />
+              startId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Outputs[OLE DB Destination Error Output]" />
             <path
               refId="Package\Upload Fact Orders Data.Paths[OLE DB Source Output]"
-              endId="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders.Inputs[OLE DB Destination Input]"
+              endId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input]"
               name="OLE DB Source Output"
               startId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output]" />
           </paths>
@@ -2957,8 +2986,8 @@ FROM DB_Talabaty_Production.dbo.DimMessage</property>
                   dataType="System.String"
                   description="The SQL command to be executed."
                   name="SqlCommand"
-                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor, Microsoft.DataTransformationServices.Controls, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91">MERGE DB_Talabaty_Production.dbo.FactOrders AS PROD_TARGET
-USING DB_Talabaty_StagingArea.dbo.FactOrders AS STAG_SOURCE
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor, Microsoft.DataTransformationServices.Controls, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91">MERGE DB_Talabaty_Production.dbo.DimOrders AS PROD_TARGET
+USING DB_Talabaty_StagingArea.dbo.DimOrders AS STAG_SOURCE
 ON PROD_TARGET.ID = STAG_SOURCE.ID 
 WHEN MATCHED AND 
 	PROD_TARGET.Updated_At &lt;&gt; STAG_SOURCE.Updated_At 
@@ -2979,14 +3008,14 @@ THEN UPDATE SET
 	PROD_TARGET.Delivered_By = STAG_SOURCE.Delivered_By,
 	PROD_TARGET.Officeboy_Requester = STAG_SOURCE.Officeboy_Requester;
 
-SELECT FO.* 
-FROM DB_Talabaty_StagingArea.dbo.FactOrders FO
-WHERE FO.Is_Deleted != 1
+SELECT DO.* 
+FROM DB_Talabaty_StagingArea.dbo.DimOrders DO
+WHERE DO.Is_Deleted != 1 and cast(DO.Created_at as date) &gt;= cast('2020-10-01' as date)
 
 EXCEPT 
 
 SELECT * 
-FROM DB_Talabaty_Production.dbo.FactOrders</property>
+FROM DB_Talabaty_Production.dbo.DimOrders</property>
                 <property
                   dataType="System.String"
                   description="The variable that contains the SQL command to be executed."
@@ -3338,7 +3367,7 @@ FROM DB_Talabaty_Production.dbo.FactOrders</property>
                 <property
                   dataType="System.String"
                   description="Specifies the name of the database object used to open a rowset."
-                  name="OpenRowset">[dbo].[FactOrders]</property>
+                  name="OpenRowset">[dbo].[DimOrders]</property>
                 <property
                   dataType="System.String"
                   description="Specifies the variable that contains the name of the database object used to open a rowset."
@@ -3432,11 +3461,23 @@ FROM DB_Talabaty_Production.dbo.FactOrders</property>
                       externalMetadataColumnId="Package\Upload Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Order_Status]"
                       lineageId="Package\Upload Orders Data\Upload Orders Data.Outputs[OLE DB Source Output].Columns[Order_Status]" />
                     <inputColumn
+                      refId="Package\Upload Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Accepted_By]"
+                      cachedDataType="i8"
+                      cachedName="Accepted_By"
+                      externalMetadataColumnId="Package\Upload Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Accepted_By]"
+                      lineageId="Package\Upload Orders Data\Upload Orders Data.Outputs[OLE DB Source Output].Columns[Accepted_By]" />
+                    <inputColumn
                       refId="Package\Upload Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Finished_By]"
                       cachedDataType="i8"
                       cachedName="Finished_By"
                       externalMetadataColumnId="Package\Upload Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Finished_By]"
                       lineageId="Package\Upload Orders Data\Upload Orders Data.Outputs[OLE DB Source Output].Columns[Finished_By]" />
+                    <inputColumn
+                      refId="Package\Upload Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Ordered_By]"
+                      cachedDataType="i8"
+                      cachedName="Ordered_By"
+                      externalMetadataColumnId="Package\Upload Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Ordered_By]"
+                      lineageId="Package\Upload Orders Data\Upload Orders Data.Outputs[OLE DB Source Output].Columns[Ordered_By]" />
                     <inputColumn
                       refId="Package\Upload Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Product_Id]"
                       cachedDataType="i8"
@@ -3473,18 +3514,6 @@ FROM DB_Talabaty_Production.dbo.FactOrders</property>
                       cachedName="Officeboy_Requester"
                       externalMetadataColumnId="Package\Upload Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Officeboy_Requester]"
                       lineageId="Package\Upload Orders Data\Upload Orders Data.Outputs[OLE DB Source Output].Columns[Officeboy_Requester]" />
-                    <inputColumn
-                      refId="Package\Upload Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Accepted_By]"
-                      cachedDataType="i8"
-                      cachedName="Accepted_By"
-                      externalMetadataColumnId="Package\Upload Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Accepted_By]"
-                      lineageId="Package\Upload Orders Data\Upload Orders Data.Outputs[OLE DB Source Output].Columns[Accepted_By]" />
-                    <inputColumn
-                      refId="Package\Upload Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Ordered_By]"
-                      cachedDataType="i8"
-                      cachedName="Ordered_By"
-                      externalMetadataColumnId="Package\Upload Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Ordered_By]"
-                      lineageId="Package\Upload Orders Data\Upload Orders Data.Outputs[OLE DB Source Output].Columns[Ordered_By]" />
                   </inputColumns>
                   <externalMetadataColumns
                     isUsed="True">
@@ -3631,8 +3660,8 @@ FROM DB_Talabaty_Production.dbo.FactOrders</property>
 FROM DB_Talabaty_StagingArea.dbo.DimOrdersMessages DOM
 INNER JOIN DB_Talabaty_StagingArea.dbo.DimMessage DM
 ON DM.ID = DOM.Messages_Id
-INNER JOIN DB_Talabaty_StagingArea.dbo.FactOrders FO
-ON FO.ID = DOM.Order_Id
+INNER JOIN DB_Talabaty_StagingArea.dbo.DimOrders DO
+ON DO.ID = DOM.Order_Id
 
 EXCEPT 
 
@@ -4496,10 +4525,10 @@ THEN UPDATE SET
 
 SELECT DISTINCT DP.* 
 FROM DB_Talabaty_StagingArea.dbo.DimProduct DP
-INNER JOIN DB_Talabaty_StagingArea.dbo.FactOrders FO
-ON DP.ID = FO.Product_Id
-INNER JOIN DB_Talabaty_StagingArea.dbo.FactProductRawMaterial FPRM
-ON DP.ID = FPRM.Product_Id
+INNER JOIN DB_Talabaty_StagingArea.dbo.DimOrders DO
+ON DP.ID = DO.Product_Id
+INNER JOIN DB_Talabaty_StagingArea.dbo.DimProductRawMaterial DPRM
+ON DP.ID = DPRM.Product_Id
 
 EXCEPT 
 
@@ -4732,13 +4761,13 @@ FROM DB_Talabaty_Production.dbo.DimProduct</property>
       </DTS:ObjectData>
     </DTS:Executable>
     <DTS:Executable
-      DTS:refId="Package\Upload Product Raw Material Data"
+      DTS:refId="Package\Upload Product Raw Material Data Dim"
       DTS:CreationName="Microsoft.Pipeline"
       DTS:Description="Data Flow Task"
-      DTS:DTSID="{AA2D7352-381A-4EBA-A663-A87492A7D73F}"
+      DTS:DTSID="{3CD38B89-14F0-414F-B9B2-17A6B6F61B23}"
       DTS:ExecutableType="Microsoft.Pipeline"
       DTS:LocaleID="-1"
-      DTS:ObjectName="Upload Product Raw Material Data"
+      DTS:ObjectName="Upload Product Raw Material Data Dim"
       DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
       <DTS:Variables />
       <DTS:ObjectData>
@@ -4746,165 +4775,11 @@ FROM DB_Talabaty_Production.dbo.DimProduct</property>
           version="1">
           <components>
             <component
-              refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data"
-              componentClassID="Microsoft.OLEDBSource"
-              contactInfo="OLE DB Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7"
-              description="OLE DB Source"
-              name="Upload Product Raw Material Data"
-              usesDispositions="true"
-              version="7">
-              <properties>
-                <property
-                  dataType="System.Int32"
-                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
-                  name="CommandTimeout">0</property>
-                <property
-                  dataType="System.String"
-                  description="Specifies the name of the database object used to open a rowset."
-                  name="OpenRowset">[dbo].[FactProductRawMaterial]</property>
-                <property
-                  dataType="System.String"
-                  description="Specifies the variable that contains the name of the database object used to open a rowset."
-                  name="OpenRowsetVariable"></property>
-                <property
-                  dataType="System.String"
-                  description="The SQL command to be executed."
-                  name="SqlCommand"
-                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor, Microsoft.DataTransformationServices.Controls, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91">SELECT DISTINCT FPRM.* 
-FROM DB_Talabaty_StagingArea.dbo.FactProductRawMaterial FPRM
-INNER JOIN DB_Talabaty_StagingArea.dbo.DimProduct DP
-ON DP.ID = FPRM.Product_Id
-INNER JOIN DB_Talabaty_StagingArea.dbo.FactOrders FO
-ON DP.ID = FO.Product_Id
-INNER JOIN DB_Talabaty_StagingArea.dbo.DimRawMaterial DRM
-ON FPRM.Raw_Material_Id = DRM.ID
-
-EXCEPT 
-
-SELECT * 
-FROM DB_Talabaty_Production.dbo.FactProductRawMaterial</property>
-                <property
-                  dataType="System.String"
-                  description="The variable that contains the SQL command to be executed."
-                  name="SqlCommandVariable"></property>
-                <property
-                  dataType="System.Int32"
-                  description="Specifies the column code page to use when code page information is unavailable from the data source."
-                  name="DefaultCodePage">1252</property>
-                <property
-                  dataType="System.Boolean"
-                  description="Forces the use of the DefaultCodePage property value when describing character data."
-                  name="AlwaysUseDefaultCodePage">false</property>
-                <property
-                  dataType="System.Int32"
-                  description="Specifies the mode used to access the database."
-                  name="AccessMode"
-                  typeConverter="AccessMode">2</property>
-                <property
-                  dataType="System.String"
-                  description="The mappings between the parameters in the SQL command and variables."
-                  name="ParameterMapping"></property>
-              </properties>
-              <connections>
-                <connection
-                  refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Connections[OleDbConnection]"
-                  connectionManagerID="{5CB5B301-F244-4B7A-81A5-D46A93F98AD6}:external"
-                  connectionManagerRefId="Project.ConnectionManagers[DB_Talabaty_Production_Connection]"
-                  description="The OLE DB runtime connection used to access the database."
-                  name="OleDbConnection" />
-              </connections>
-              <outputs>
-                <output
-                  refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Output]"
-                  name="OLE DB Source Output">
-                  <outputColumns>
-                    <outputColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Output].Columns[Product_Id]"
-                      dataType="i8"
-                      errorOrTruncationOperation="Conversion"
-                      errorRowDisposition="FailComponent"
-                      externalMetadataColumnId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Output].ExternalColumns[Product_Id]"
-                      lineageId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Output].Columns[Product_Id]"
-                      name="Product_Id"
-                      truncationRowDisposition="FailComponent" />
-                    <outputColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Output].Columns[Raw_Material_Id]"
-                      dataType="i8"
-                      errorOrTruncationOperation="Conversion"
-                      errorRowDisposition="FailComponent"
-                      externalMetadataColumnId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Output].ExternalColumns[Raw_Material_Id]"
-                      lineageId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Output].Columns[Raw_Material_Id]"
-                      name="Raw_Material_Id"
-                      truncationRowDisposition="FailComponent" />
-                    <outputColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Output].Columns[Raw_Material_Unit_Number]"
-                      dataType="i4"
-                      errorOrTruncationOperation="Conversion"
-                      errorRowDisposition="FailComponent"
-                      externalMetadataColumnId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Output].ExternalColumns[Raw_Material_Unit_Number]"
-                      lineageId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Output].Columns[Raw_Material_Unit_Number]"
-                      name="Raw_Material_Unit_Number"
-                      truncationRowDisposition="FailComponent" />
-                  </outputColumns>
-                  <externalMetadataColumns
-                    isUsed="True">
-                    <externalMetadataColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Output].ExternalColumns[Product_Id]"
-                      dataType="i8"
-                      name="Product_Id" />
-                    <externalMetadataColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Output].ExternalColumns[Raw_Material_Id]"
-                      dataType="i8"
-                      name="Raw_Material_Id" />
-                    <externalMetadataColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Output].ExternalColumns[Raw_Material_Unit_Number]"
-                      dataType="i4"
-                      name="Raw_Material_Unit_Number" />
-                  </externalMetadataColumns>
-                </output>
-                <output
-                  refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Error Output]"
-                  isErrorOut="true"
-                  name="OLE DB Source Error Output">
-                  <outputColumns>
-                    <outputColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Error Output].Columns[Product_Id]"
-                      dataType="i8"
-                      lineageId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Error Output].Columns[Product_Id]"
-                      name="Product_Id" />
-                    <outputColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Error Output].Columns[Raw_Material_Id]"
-                      dataType="i8"
-                      lineageId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Error Output].Columns[Raw_Material_Id]"
-                      name="Raw_Material_Id" />
-                    <outputColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Error Output].Columns[Raw_Material_Unit_Number]"
-                      dataType="i4"
-                      lineageId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Error Output].Columns[Raw_Material_Unit_Number]"
-                      name="Raw_Material_Unit_Number" />
-                    <outputColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
-                      dataType="i4"
-                      lineageId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
-                      name="ErrorCode"
-                      specialFlags="1" />
-                    <outputColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
-                      dataType="i4"
-                      lineageId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
-                      name="ErrorColumn"
-                      specialFlags="2" />
-                  </outputColumns>
-                  <externalMetadataColumns />
-                </output>
-              </outputs>
-            </component>
-            <component
-              refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial"
+              refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination"
               componentClassID="Microsoft.OLEDBDestination"
               contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
               description="OLE DB Destination"
-              name="Upload Product Raw Material Data to FactProductRawMaterial"
+              name="OLE DB Destination"
               usesDispositions="true"
               version="4">
               <properties>
@@ -4915,7 +4790,7 @@ FROM DB_Talabaty_Production.dbo.FactProductRawMaterial</property>
                 <property
                   dataType="System.String"
                   description="Specifies the name of the database object used to open a rowset."
-                  name="OpenRowset">[dbo].[FactProductRawMaterial]</property>
+                  name="OpenRowset">[dbo].[DimProductRawMaterial]</property>
                 <property
                   dataType="System.String"
                   description="Specifies the variable that contains the name of the database object used to open a rowset."
@@ -4957,7 +4832,7 @@ FROM DB_Talabaty_Production.dbo.FactProductRawMaterial</property>
               </properties>
               <connections>
                 <connection
-                  refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Connections[OleDbConnection]"
+                  refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Connections[OleDbConnection]"
                   connectionManagerID="{5CB5B301-F244-4B7A-81A5-D46A93F98AD6}:external"
                   connectionManagerRefId="Project.ConnectionManagers[DB_Talabaty_Production_Connection]"
                   description="The OLE DB runtime connection used to access the database."
@@ -4965,66 +4840,340 @@ FROM DB_Talabaty_Production.dbo.FactProductRawMaterial</property>
               </connections>
               <inputs>
                 <input
-                  refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Inputs[OLE DB Destination Input]"
+                  refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input]"
                   errorOrTruncationOperation="Insert"
                   errorRowDisposition="FailComponent"
                   hasSideEffects="true"
                   name="OLE DB Destination Input">
                   <inputColumns>
                     <inputColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Inputs[OLE DB Destination Input].Columns[Raw_Material_Unit_Number]"
-                      cachedDataType="i4"
-                      cachedName="Raw_Material_Unit_Number"
-                      externalMetadataColumnId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Inputs[OLE DB Destination Input].ExternalColumns[Raw_Material_Unit_Number]"
-                      lineageId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Output].Columns[Raw_Material_Unit_Number]" />
-                    <inputColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Inputs[OLE DB Destination Input].Columns[Product_Id]"
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Product_Id]"
                       cachedDataType="i8"
                       cachedName="Product_Id"
-                      externalMetadataColumnId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Inputs[OLE DB Destination Input].ExternalColumns[Product_Id]"
-                      lineageId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Output].Columns[Product_Id]" />
+                      externalMetadataColumnId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Product_Id]"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[Product_Id]" />
                     <inputColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Inputs[OLE DB Destination Input].Columns[Raw_Material_Id]"
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Raw_Material_Id]"
                       cachedDataType="i8"
                       cachedName="Raw_Material_Id"
-                      externalMetadataColumnId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Inputs[OLE DB Destination Input].ExternalColumns[Raw_Material_Id]"
-                      lineageId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Output].Columns[Raw_Material_Id]" />
+                      externalMetadataColumnId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Raw_Material_Id]"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[Raw_Material_Id]" />
+                    <inputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Raw_Material_Unit_Number]"
+                      cachedDataType="i4"
+                      cachedName="Raw_Material_Unit_Number"
+                      externalMetadataColumnId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Raw_Material_Unit_Number]"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[Raw_Material_Unit_Number]" />
+                    <inputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Eff_Date]"
+                      cachedDataType="dbDate"
+                      cachedName="Eff_Date"
+                      externalMetadataColumnId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Eff_Date]"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[Eff_Date]" />
+                    <inputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[End_Date]"
+                      cachedDataType="dbDate"
+                      cachedName="End_Date"
+                      externalMetadataColumnId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[End_Date]"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[End_Date]" />
+                    <inputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Current_Flag]"
+                      cachedDataType="bool"
+                      cachedName="Current_Flag"
+                      externalMetadataColumnId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Current_Flag]"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[Current_Flag]" />
                   </inputColumns>
                   <externalMetadataColumns
                     isUsed="True">
                     <externalMetadataColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Inputs[OLE DB Destination Input].ExternalColumns[Product_Id]"
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[ID]"
+                      dataType="i4"
+                      name="ID" />
+                    <externalMetadataColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Product_Id]"
                       dataType="i8"
                       name="Product_Id" />
                     <externalMetadataColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Inputs[OLE DB Destination Input].ExternalColumns[Raw_Material_Id]"
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Raw_Material_Id]"
                       dataType="i8"
                       name="Raw_Material_Id" />
                     <externalMetadataColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Inputs[OLE DB Destination Input].ExternalColumns[Raw_Material_Unit_Number]"
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Raw_Material_Unit_Number]"
                       dataType="i4"
                       name="Raw_Material_Unit_Number" />
+                    <externalMetadataColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Eff_Date]"
+                      dataType="dbDate"
+                      name="Eff_Date" />
+                    <externalMetadataColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[End_Date]"
+                      dataType="dbDate"
+                      name="End_Date" />
+                    <externalMetadataColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Current_Flag]"
+                      dataType="bool"
+                      name="Current_Flag" />
                   </externalMetadataColumns>
                 </input>
               </inputs>
               <outputs>
                 <output
-                  refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Outputs[OLE DB Destination Error Output]"
+                  refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Outputs[OLE DB Destination Error Output]"
                   exclusionGroup="1"
                   isErrorOut="true"
                   name="OLE DB Destination Error Output"
-                  synchronousInputId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Inputs[OLE DB Destination Input]">
+                  synchronousInputId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input]">
                   <outputColumns>
                     <outputColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
                       dataType="i4"
-                      lineageId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
                       name="ErrorCode"
                       specialFlags="1" />
                     <outputColumn
-                      refId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
                       dataType="i4"
-                      lineageId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Upload Product Raw Material Data Dim\OLE DB Source"
+              componentClassID="Microsoft.OLEDBSource"
+              contactInfo="OLE DB Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7"
+              description="OLE DB Source"
+              name="OLE DB Source"
+              usesDispositions="true"
+              version="7">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[ProductRawMaterial]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor, Microsoft.DataTransformationServices.Controls, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91">INSERT  INTO [DB_Talabaty_Production].[dbo].[DimProductRawMaterial]
+SELECT       [Product_Id]
+                   ,[Raw_Material_Id]
+                   ,[Raw_Material_Unit_Number]
+	,[Eff_Date]
+	,[End_Date]
+	,[Current_Flag]
+FROM (
+MERGE DB_Talabaty_Production.dbo.DimProductRawMaterial AS Target
+USING DB_Talabaty_StagingArea.dbo.DimProductRawMaterial AS Source
+ON Target.[Product_Id] = Source.[Product_Id] AND Target.[Raw_Material_Id] = Source.[Raw_Material_Id]
+WHEN NOT MATCHED 
+	THEN 
+		INSERT VALUES 
+			(Source.[Product_Id]
+			,Source.[Raw_Material_Id]
+			,Source.[Raw_Material_Unit_Number]
+			,CAST(CONVERT(CHAR(10), GETDATE(), 101) AS DATETIME)
+			,CAST('12/31/2199' AS DATETIME)
+			,'1'
+			)
+WHEN MATCHED AND TARGET.[Current_Flag] = '1' AND Target.[Raw_Material_Unit_Number] &lt;&gt; source.[Raw_Material_Unit_Number]
+	THEN 
+		UPDATE SET
+			Target.Current_Flag = '0' ,
+			Target.End_date = CAST(CONVERT(CHAR(10), GETDATE(), 101) AS DATETIME)
+OUTPUT
+		$Action Action_Out ,
+		Source.[Product_Id],
+		Source.[Raw_Material_Id] ,
+		Source.[Raw_Material_Unit_Number],
+		CAST(CONVERT(CHAR(10), GETDATE(), 101) AS DATETIME) Eff_Date ,
+		CAST('12/31/2199' AS DATETIME) End_Date ,
+		'1' Current_Flag) AS MERGE_OUT
+	WHERE   MERGE_OUT.Action_Out = 'UPDATE';
+
+SELECT       *
+FROM [DB_Talabaty_Production].[dbo].[DimProductRawMaterial]
+Except 
+SELECT       *
+FROM [DB_Talabaty_Production].[dbo].[DimProductRawMaterial]</property>
+                <property
+                  dataType="System.String"
+                  description="The variable that contains the SQL command to be executed."
+                  name="SqlCommandVariable"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">2</property>
+                <property
+                  dataType="System.String"
+                  description="The mappings between the parameters in the SQL command and variables."
+                  name="ParameterMapping"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Connections[OleDbConnection]"
+                  connectionManagerID="{5CB5B301-F244-4B7A-81A5-D46A93F98AD6}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[DB_Talabaty_Production_Connection]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output]"
+                  name="OLE DB Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[Product_Id]"
+                      dataType="i8"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Product_Id]"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[Product_Id]"
+                      name="Product_Id"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[Raw_Material_Id]"
+                      dataType="i8"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Raw_Material_Id]"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[Raw_Material_Id]"
+                      name="Raw_Material_Id"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[Raw_Material_Unit_Number]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Raw_Material_Unit_Number]"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[Raw_Material_Unit_Number]"
+                      name="Raw_Material_Unit_Number"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[Eff_Date]"
+                      dataType="dbDate"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Eff_Date]"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[Eff_Date]"
+                      name="Eff_Date"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[End_Date]"
+                      dataType="dbDate"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[End_Date]"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[End_Date]"
+                      name="End_Date"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[Current_Flag]"
+                      dataType="bool"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Current_Flag]"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].Columns[Current_Flag]"
+                      name="Current_Flag"
+                      truncationRowDisposition="FailComponent" />
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Product_Id]"
+                      dataType="i8"
+                      name="Product_Id" />
+                    <externalMetadataColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Raw_Material_Id]"
+                      dataType="i8"
+                      name="Raw_Material_Id" />
+                    <externalMetadataColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Raw_Material_Unit_Number]"
+                      dataType="i4"
+                      name="Raw_Material_Unit_Number" />
+                    <externalMetadataColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Eff_Date]"
+                      dataType="dbDate"
+                      name="Eff_Date" />
+                    <externalMetadataColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[End_Date]"
+                      dataType="dbDate"
+                      name="End_Date" />
+                    <externalMetadataColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Current_Flag]"
+                      dataType="bool"
+                      name="Current_Flag" />
+                    <externalMetadataColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[ID]"
+                      dataType="i4"
+                      name="ID" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Error Output]"
+                  isErrorOut="true"
+                  name="OLE DB Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Product_Id]"
+                      dataType="i8"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Product_Id]"
+                      name="Product_Id" />
+                    <outputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Raw_Material_Id]"
+                      dataType="i8"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Raw_Material_Id]"
+                      name="Raw_Material_Id" />
+                    <outputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Raw_Material_Unit_Number]"
+                      dataType="i4"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Raw_Material_Unit_Number]"
+                      name="Raw_Material_Unit_Number" />
+                    <outputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Eff_Date]"
+                      dataType="dbDate"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Eff_Date]"
+                      name="Eff_Date" />
+                    <outputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[End_Date]"
+                      dataType="dbDate"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[End_Date]"
+                      name="End_Date" />
+                    <outputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Current_Flag]"
+                      dataType="bool"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Current_Flag]"
+                      name="Current_Flag" />
+                    <outputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
                       name="ErrorColumn"
                       specialFlags="2" />
                   </outputColumns>
@@ -5035,10 +5184,10 @@ FROM DB_Talabaty_Production.dbo.FactProductRawMaterial</property>
           </components>
           <paths>
             <path
-              refId="Package\Upload Product Raw Material Data.Paths[OLE DB Source Output]"
-              endId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial.Inputs[OLE DB Destination Input]"
+              refId="Package\Upload Product Raw Material Data Dim.Paths[OLE DB Source Output]"
+              endId="Package\Upload Product Raw Material Data Dim\OLE DB Destination.Inputs[OLE DB Destination Input]"
               name="OLE DB Source Output"
-              startId="Package\Upload Product Raw Material Data\Upload Product Raw Material Data.Outputs[OLE DB Source Output]" />
+              startId="Package\Upload Product Raw Material Data Dim\OLE DB Source.Outputs[OLE DB Source Output]" />
           </paths>
         </pipeline>
       </DTS:ObjectData>
@@ -5102,8 +5251,8 @@ THEN UPDATE SET
 
 SELECT DISTINCT DRM.* 
 FROM DB_Talabaty_StagingArea.dbo.DimRawMaterial DRM
-INNER JOIN DB_Talabaty_StagingArea.dbo.FactProductRawMaterial FPRM
-ON FPRM.Raw_Material_Id = DRM.ID
+INNER JOIN DB_Talabaty_StagingArea.dbo.DimProductRawMaterial DPRM
+ON DPRM.Raw_Material_Id = DRM.ID
 INNER JOIN DB_Talabaty_StagingArea.dbo.DimUnit DU
 ON DRM.Buy_Unit_Id = DU.ID OR DRM.Sell_Unit_Id = DU.ID
 
@@ -6741,8 +6890,8 @@ THEN UPDATE SET
 
 SELECT DU.* 
 FROM DB_Talabaty_StagingArea.dbo.DimUser DU
-INNER JOIN DB_Talabaty_StagingArea.dbo.FactOrders FO
-ON DU.ID = FO.Ordered_By
+INNER JOIN DB_Talabaty_StagingArea.dbo.DimOrders DO
+ON DU.ID = DO.Ordered_By
 
 EXCEPT 
 
@@ -7305,8 +7454,8 @@ FROM DB_Talabaty_Production.dbo.DimUser</property>
 FROM DB_Talabaty_StagingArea.dbo.DimUserTokens DUT
 INNER JOIN DB_Talabaty_StagingArea.dbo.DimUser DU
 ON DU.ID = DUT.User_Id
-INNER JOIN DB_Talabaty_StagingArea.dbo.FactOrders FO
-ON DU.ID = FO.Ordered_By
+INNER JOIN DB_Talabaty_StagingArea.dbo.DimOrders DO
+ON DU.ID = DO.Ordered_By
 
 EXCEPT 
 
@@ -7588,14 +7737,6 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
       DTS:ObjectName="Constraint"
       DTS:To="Package\Upload Date Data" />
     <DTS:PrecedenceConstraint
-      DTS:refId="Package.PrecedenceConstraints[Constraint 1]"
-      DTS:CreationName=""
-      DTS:DTSID="{E41C04C9-AF03-4067-82F0-6944AA7B363E}"
-      DTS:From="Package\Upload Product Data"
-      DTS:LogicalAnd="True"
-      DTS:ObjectName="Constraint 1"
-      DTS:To="Package\Upload Product Raw Material Data" />
-    <DTS:PrecedenceConstraint
       DTS:refId="Package.PrecedenceConstraints[Constraint 10]"
       DTS:CreationName=""
       DTS:DTSID="{2E0F5A59-4977-4A74-9D97-4E643821E299}"
@@ -7668,14 +7809,6 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
       DTS:ObjectName="Constraint 29"
       DTS:To="Package\Upload Orders Data" />
     <DTS:PrecedenceConstraint
-      DTS:refId="Package.PrecedenceConstraints[Constraint 3]"
-      DTS:CreationName=""
-      DTS:DTSID="{D12FA910-5BFD-4A01-8445-FE67232E30C9}"
-      DTS:From="Package\Upload Product Raw Material Data"
-      DTS:LogicalAnd="True"
-      DTS:ObjectName="Constraint 3"
-      DTS:To="Package\Upload Fact Orders Data" />
-    <DTS:PrecedenceConstraint
       DTS:refId="Package.PrecedenceConstraints[Constraint 30]"
       DTS:CreationName=""
       DTS:DTSID="{DFA6BCD1-C60B-4E33-8645-FCB76408C770}"
@@ -7716,13 +7849,29 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
       DTS:ObjectName="Constraint 4"
       DTS:To="Package\Upload Fact Orders Data" />
     <DTS:PrecedenceConstraint
-      DTS:refId="Package.PrecedenceConstraints[Constraint 7]"
+      DTS:refId="Package.PrecedenceConstraints[Constraint 5]"
       DTS:CreationName=""
-      DTS:DTSID="{2A962877-183D-4E3F-8B63-1063FAF33A02}"
+      DTS:DTSID="{8C9425F9-77AD-403C-9C3C-57C98088247C}"
+      DTS:From="Package\Upload Product Data"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint 5"
+      DTS:To="Package\Upload Product Raw Material Data Dim" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint 6]"
+      DTS:CreationName=""
+      DTS:DTSID="{2950AC41-FCFA-4382-84A9-354D04B16C95}"
       DTS:From="Package\Upload Raw Material Data"
       DTS:LogicalAnd="True"
-      DTS:ObjectName="Constraint 7"
-      DTS:To="Package\Upload Product Raw Material Data" />
+      DTS:ObjectName="Constraint 6"
+      DTS:To="Package\Upload Product Raw Material Data Dim" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint 8]"
+      DTS:CreationName=""
+      DTS:DTSID="{D6CD7FC1-F6D2-4992-A79F-C3FA4F4F3275}"
+      DTS:From="Package\Upload Product Raw Material Data Dim"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint 8"
+      DTS:To="Package\Upload Fact Orders Data" />
   </DTS:PrecedenceConstraints>
   <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
 <!--This CDATA section contains the layout information of the package. The section includes information such as (x,y) coordinates, width, and height.-->
@@ -7739,74 +7888,70 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
         <NodeLayout
           Size="197,42"
           Id="Package\Upload App Version Data"
-          TopLeft="40.75,43" />
+          TopLeft="218.527777777778,43" />
         <NodeLayout
           Size="182,42"
           Id="Package\Upload Category Data"
-          TopLeft="246.472222222222,145.972222222221" />
+          TopLeft="424.25,145.972222222221" />
         <NodeLayout
           Size="162,42"
           Id="Package\Upload Date Data"
-          TopLeft="515.059523809524,506.190476190476" />
+          TopLeft="692.837301587301,506.190476190476" />
         <NodeLayout
           Size="195,42"
           Id="Package\Upload Fact Orders Data"
-          TopLeft="275.238095238095,509.761904761905" />
+          TopLeft="453.015873015873,509.761904761905" />
         <NodeLayout
           Size="161,42"
           Id="Package\Upload Files Data"
-          TopLeft="257.361111111111,45.75" />
+          TopLeft="435.138888888888,45.75" />
         <NodeLayout
           Size="181,42"
           Id="Package\Upload Message Data"
-          TopLeft="970.476190476194,500.690476190476" />
+          TopLeft="1148.25396825397,500.690476190476" />
         <NodeLayout
           Size="172,42"
           Id="Package\Upload Orders Data"
-          TopLeft="627.070707070708,279.189393939393" />
+          TopLeft="804.848484848485,279.189393939393" />
         <NodeLayout
           Size="216,42"
           Id="Package\Upload Orders Message Data"
-          TopLeft="691.385281385281,503.463203463203" />
+          TopLeft="869.163059163058,503.463203463203" />
         <NodeLayout
           Size="191,42"
           Id="Package\Upload Permission Data"
-          TopLeft="969.583333333337,44.9722222222224" />
+          TopLeft="1147.36111111111,44.9722222222224" />
         <NodeLayout
           Size="176,42"
           Id="Package\Upload Product Data"
-          TopLeft="253.972222222223,274.972222222221" />
-        <NodeLayout
-          Size="240,42"
-          Id="Package\Upload Product Raw Material Data"
-          TopLeft="104.444444444445,390.305555555555" />
+          TopLeft="431.750000000001,274.972222222221" />
         <NodeLayout
           Size="201,42"
           Id="Package\Upload Raw Material Data"
-          TopLeft="20.5833333333332,276.777777777777" />
+          TopLeft="198.361111111111,276.777777777777" />
         <NodeLayout
           Size="215,42"
           Id="Package\Upload Role Permission Data"
-          TopLeft="922.222222222226,154.972222222222" />
+          TopLeft="1100,154.972222222222" />
         <NodeLayout
           Size="166,42"
           Id="Package\Upload Roles Data"
-          TopLeft="762.083333333337,48.4444444444443" />
+          TopLeft="939.861111111114,48.4444444444443" />
         <NodeLayout
           Size="159,42"
           Id="Package\Upload Unit Data"
-          TopLeft="38.083333333333,145.277777777777" />
+          TopLeft="215.861111111111,145.277777777777" />
         <NodeLayout
           Size="161,42"
           Id="Package\Upload User Data"
-          TopLeft="673.674603174606,159.119408369408" />
+          TopLeft="851.452380952383,159.119408369408" />
         <NodeLayout
           Size="198,42"
           Id="Package\Upload User Tokens Data"
-          TopLeft="942.333333333337,274.833333333333" />
+          TopLeft="1120.11111111111,274.833333333333" />
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint]"
-          TopLeft="672.070707070708,321.189393939393">
+          TopLeft="849.848484848485,321.189393939393">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -7839,42 +7984,8 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
-          Id="Package.PrecedenceConstraints[Constraint 1]"
-          TopLeft="341.972222222223,316.972222222221">
-          <EdgeLayout.Curve>
-            <mssgle:Curve
-              StartConnector="{assembly:Null}"
-              EndConnector="-78.8611111111117,73.3333333333337"
-              Start="0,0"
-              End="-78.8611111111117,65.8333333333337">
-              <mssgle:Curve.Segments>
-                <mssgle:SegmentCollection
-                  Capacity="5">
-                  <mssgle:LineSegment
-                    End="0,39.7086092715234" />
-                  <mssgle:CubicBezierSegment
-                    Point1="0,39.7086092715234"
-                    Point2="0,43.7086092715234"
-                    Point3="-4,43.7086092715234" />
-                  <mssgle:LineSegment
-                    End="-74.8611111111117,43.7086092715234" />
-                  <mssgle:CubicBezierSegment
-                    Point1="-74.8611111111117,43.7086092715234"
-                    Point2="-78.8611111111117,43.7086092715234"
-                    Point3="-78.8611111111117,47.7086092715234" />
-                  <mssgle:LineSegment
-                    End="-78.8611111111117,65.8333333333337" />
-                </mssgle:SegmentCollection>
-              </mssgle:Curve.Segments>
-            </mssgle:Curve>
-          </EdgeLayout.Curve>
-          <EdgeLayout.Labels>
-            <EdgeLabelCollection />
-          </EdgeLayout.Labels>
-        </EdgeLayout>
-        <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 10]"
-          TopLeft="339.722222222222,187.972222222221">
+          TopLeft="517.5,187.972222222221">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -7896,7 +8007,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
         </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 11]"
-          TopLeft="119.333333333333,187.277777777777">
+          TopLeft="297.111111111111,187.277777777777">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -7918,7 +8029,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
         </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 16]"
-          TopLeft="1064.65277777778,86.9722222222224">
+          TopLeft="1242.43055555556,86.9722222222224">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -7940,7 +8051,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
         </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 17]"
-          TopLeft="871.41666666667,90.4444444444443">
+          TopLeft="1049.19444444445,90.4444444444443">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -7974,7 +8085,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
         </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 19]"
-          TopLeft="818.750000000004,90.4444444444443">
+          TopLeft="996.527777777781,90.4444444444443">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -8008,7 +8119,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
         </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 2]"
-          TopLeft="663.870707070708,321.189393939393">
+          TopLeft="841.648484848485,321.189393939393">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -8042,7 +8153,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
         </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 21]"
-          TopLeft="754.174603174606,201.119408369408">
+          TopLeft="931.952380952383,201.119408369408">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -8076,7 +8187,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
         </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 23]"
-          TopLeft="792.424603174606,201.119408369408">
+          TopLeft="970.202380952383,201.119408369408">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -8110,7 +8221,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
         </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 29]"
-          TopLeft="714.497655122657,201.119408369408">
+          TopLeft="892.275432900434,201.119408369408">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -8131,42 +8242,8 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
-          Id="Package.PrecedenceConstraints[Constraint 3]"
-          TopLeft="224.444444444445,432.305555555555">
-          <EdgeLayout.Curve>
-            <mssgle:Curve
-              StartConnector="{assembly:Null}"
-              EndConnector="117.126984126984,77.4563492063499"
-              Start="0,0"
-              End="117.126984126984,69.9563492063499">
-              <mssgle:Curve.Segments>
-                <mssgle:SegmentCollection
-                  Capacity="5">
-                  <mssgle:LineSegment
-                    End="0,42.0955893038807" />
-                  <mssgle:CubicBezierSegment
-                    Point1="0,42.0955893038807"
-                    Point2="0,46.0955893038807"
-                    Point3="4,46.0955893038807" />
-                  <mssgle:LineSegment
-                    End="113.126984126984,46.0955893038807" />
-                  <mssgle:CubicBezierSegment
-                    Point1="113.126984126984,46.0955893038807"
-                    Point2="117.126984126984,46.0955893038807"
-                    Point3="117.126984126984,50.0955893038807" />
-                  <mssgle:LineSegment
-                    End="117.126984126984,69.9563492063499" />
-                </mssgle:SegmentCollection>
-              </mssgle:Curve.Segments>
-            </mssgle:Curve>
-          </EdgeLayout.Curve>
-          <EdgeLayout.Labels>
-            <EdgeLabelCollection />
-          </EdgeLayout.Labels>
-        </EdgeLayout>
-        <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 30]"
-          TopLeft="429.972222222223,298.080808080807">
+          TopLeft="607.75,298.080808080807">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -8188,7 +8265,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
         </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 31]"
-          TopLeft="754.070707070708,321.189393939393">
+          TopLeft="931.848484848485,321.189393939393">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -8222,7 +8299,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
         </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 32]"
-          TopLeft="970.476190476193,523.07683982684">
+          TopLeft="1148.25396825397,523.07683982684">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -8244,7 +8321,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
         </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 33]"
-          TopLeft="713.070707070708,321.189393939393">
+          TopLeft="890.848484848485,321.189393939393">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -8278,7 +8355,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
         </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 4]"
-          TopLeft="515.059523809524,528.97619047619">
+          TopLeft="692.837301587301,528.97619047619">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -8298,32 +8375,104 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
             <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
+        <NodeLayout
+          Size="262,42"
+          Id="Package\Upload Product Raw Material Data Dim"
+          TopLeft="280,396.666666666667" />
         <EdgeLayout
-          Id="Package.PrecedenceConstraints[Constraint 7]"
-          TopLeft="121.083333333333,318.777777777777">
+          Id="Package.PrecedenceConstraints[Constraint 5]"
+          TopLeft="519.750000000001,316.972222222221">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="64.6944444444448,71.5277777777777"
+              EndConnector="-66.4166666666673,79.6944444444459"
               Start="0,0"
-              End="64.6944444444448,64.0277777777777">
+              End="-66.4166666666673,72.1944444444459">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,38.6324503311258" />
+                    End="0,43.5264289327272" />
                   <mssgle:CubicBezierSegment
-                    Point1="0,38.6324503311258"
-                    Point2="0,42.6324503311258"
-                    Point3="4,42.6324503311258" />
+                    Point1="0,43.5264289327272"
+                    Point2="0,47.5264289327272"
+                    Point3="-4,47.5264289327272" />
                   <mssgle:LineSegment
-                    End="60.6944444444448,42.6324503311258" />
+                    End="-62.4166666666673,47.5264289327272" />
                   <mssgle:CubicBezierSegment
-                    Point1="60.6944444444448,42.6324503311258"
-                    Point2="64.6944444444448,42.6324503311258"
-                    Point3="64.6944444444448,46.6324503311258" />
+                    Point1="-62.4166666666673,47.5264289327272"
+                    Point2="-66.4166666666673,47.5264289327272"
+                    Point3="-66.4166666666673,51.5264289327272" />
                   <mssgle:LineSegment
-                    End="64.6944444444448,64.0277777777777" />
+                    End="-66.4166666666673,72.1944444444459" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 6]"
+          TopLeft="298.861111111111,318.777777777777">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="69.8055555555555,77.8888888888899"
+              Start="0,0"
+              End="69.8055555555555,70.3888888888899">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,42.4496712190193" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,42.4496712190193"
+                    Point2="0,46.4496712190193"
+                    Point3="4,46.4496712190193" />
+                  <mssgle:LineSegment
+                    End="65.8055555555555,46.4496712190193" />
+                  <mssgle:CubicBezierSegment
+                    Point1="65.8055555555555,46.4496712190193"
+                    Point2="69.8055555555555,46.4496712190193"
+                    Point3="69.8055555555555,50.4496712190193" />
+                  <mssgle:LineSegment
+                    End="69.8055555555555,70.3888888888899" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 8]"
+          TopLeft="411,438.666666666667">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="108.349206349206,71.0952380952382"
+              Start="0,0"
+              End="108.349206349206,63.5952380952382">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,38.3099840139515" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,38.3099840139515"
+                    Point2="0,42.3099840139515"
+                    Point3="4,42.3099840139515" />
+                  <mssgle:LineSegment
+                    End="104.349206349206,42.3099840139515" />
+                  <mssgle:CubicBezierSegment
+                    Point1="104.349206349206,42.3099840139515"
+                    Point2="108.349206349206,42.3099840139515"
+                    Point3="108.349206349206,46.3099840139515" />
+                  <mssgle:LineSegment
+                    End="108.349206349206,63.5952380952382" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -8469,7 +8618,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
     design-time-name="Package\Upload Date Data">
     <LayoutInfo>
       <GraphLayout
-        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="171,42"
           Id="Package\Upload Date Data\OLE DB Destination"
@@ -8501,9 +8650,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -8525,9 +8672,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -8569,27 +8714,23 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
           Id="Package\Upload Fact Orders Data\Upload Fact Orders Data"
           TopLeft="393,52" />
         <NodeLayout
-          Size="288,42"
-          Id="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders"
-          TopLeft="350,180" />
-        <NodeLayout
-          Size="172,42"
-          Id="Package\Upload Fact Orders Data\Flat File Destination"
-          TopLeft="412,277" />
+          Size="239,42"
+          Id="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders"
+          TopLeft="371,178" />
         <EdgeLayout
           Id="Package\Upload Fact Orders Data.Paths[OLE DB Source Output]"
-          TopLeft="492.25,94">
+          TopLeft="490.5,94">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,86"
+              EndConnector="0,84"
               Start="0,0"
-              End="0,78.5">
+              End="0,76.5">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,78.5" />
+                    End="0,76.5" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -8598,27 +8739,31 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
             <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
+        <NodeLayout
+          Size="172,42"
+          Id="Package\Upload Fact Orders Data\Flat File Destination"
+          TopLeft="412,277" />
         <EdgeLayout
           Id="Package\Upload Fact Orders Data.Paths[OLE DB Destination Error Output]"
-          TopLeft="496,222">
+          TopLeft="494.25,220">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,55"
+              EndConnector="0,57"
               Start="0,0"
-              End="0,47.5">
+              End="0,49.5">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,47.5" />
+                    End="0,49.5" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
             <mssgm:EdgeLabel
-              BoundingBox="-73.20890625,18.033203125,146.4178125,11.43359375"
+              BoundingBox="-73.20890625,19.033203125,146.4178125,11.43359375"
               RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
@@ -8634,7 +8779,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
     </Properties>
   </PipelineComponentMetadata>
   <PipelineComponentMetadata
-    design-time-name="Package\Upload Fact Orders Data\Upload Fact Orders Data to Test_FactOrders">
+    design-time-name="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders">
     <Properties>
       <Property>
         <Name>DataSourceViewID</Name>
@@ -8777,7 +8922,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
     design-time-name="Package\Upload Orders Data">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="239,42"
           Id="Package\Upload Orders Data\Upload Orders Data to FactOrders"
@@ -8805,9 +8950,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -8838,7 +8981,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
     design-time-name="Package\Upload Orders Message Data">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="327,42"
           Id="Package\Upload Orders Message Data\Upload Orders Message Data to DimOrdersMessages"
@@ -8866,9 +9009,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -8965,7 +9106,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
     design-time-name="Package\Upload Product Data">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="207,42"
           Id="Package\Upload Product Data\Upload Data to DimProduct"
@@ -8993,9 +9134,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -9028,76 +9167,10 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
     </Properties>
   </PipelineComponentMetadata>
   <TaskHost
-    design-time-name="Package\Upload Product Raw Material Data">
-    <LayoutInfo>
-      <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
-        <NodeLayout
-          Size="369,42"
-          Id="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial"
-          TopLeft="235,174" />
-        <NodeLayout
-          Size="240,42"
-          Id="Package\Upload Product Raw Material Data\Upload Product Raw Material Data"
-          TopLeft="303,51" />
-        <EdgeLayout
-          Id="Package\Upload Product Raw Material Data.Paths[OLE DB Source Output]"
-          TopLeft="421.25,93">
-          <EdgeLayout.Curve>
-            <mssgle:Curve
-              StartConnector="{assembly:Null}"
-              EndConnector="0,81"
-              Start="0,0"
-              End="0,73.5">
-              <mssgle:Curve.Segments>
-                <mssgle:SegmentCollection
-                  Capacity="5">
-                  <mssgle:LineSegment
-                    End="0,73.5" />
-                </mssgle:SegmentCollection>
-              </mssgle:Curve.Segments>
-            </mssgle:Curve>
-          </EdgeLayout.Curve>
-          <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
-          </EdgeLayout.Labels>
-        </EdgeLayout>
-      </GraphLayout>
-    </LayoutInfo>
-  </TaskHost>
-  <PipelineComponentMetadata
-    design-time-name="Package\Upload Product Raw Material Data\Upload Product Raw Material Data">
-    <Properties>
-      <Property>
-        <Name>DataSourceViewID</Name>
-      </Property>
-      <Property>
-        <Name>TableInfoObjectType</Name>
-        <Value
-          type="q2:string">Table</Value>
-      </Property>
-    </Properties>
-  </PipelineComponentMetadata>
-  <PipelineComponentMetadata
-    design-time-name="Package\Upload Product Raw Material Data\Upload Product Raw Material Data to FactProductRawMaterial">
-    <Properties>
-      <Property>
-        <Name>DataSourceViewID</Name>
-      </Property>
-      <Property>
-        <Name>TableInfoObjectType</Name>
-        <Value
-          type="q2:string">Table</Value>
-      </Property>
-    </Properties>
-  </PipelineComponentMetadata>
-  <TaskHost
     design-time-name="Package\Upload Raw Material Data">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="201,42"
           Id="Package\Upload Raw Material Data\Upload Raw Material Data"
@@ -9125,9 +9198,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -9285,7 +9356,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
     design-time-name="Package\Upload Unit Data">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="191,42"
           Id="Package\Upload Unit Data\Upload Data to DimUnit"
@@ -9313,9 +9384,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -9351,7 +9420,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
     design-time-name="Package\Upload User Data">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="161,42"
           Id="Package\Upload User Data\Upload User Data"
@@ -9379,9 +9448,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -9412,7 +9479,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
     design-time-name="Package\Upload User Tokens Data">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="288,42"
           Id="Package\Upload User Tokens Data\Upload User Tokens Data to DimUserTokens"
@@ -9440,9 +9507,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -9458,6 +9523,57 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
   </PipelineComponentMetadata>
   <PipelineComponentMetadata
     design-time-name="Package\Upload User Tokens Data\Upload User Tokens Data to DimUserTokens">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <TaskHost
+    design-time-name="Package\Upload Product Raw Material Data Dim">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="150,42"
+          Id="Package\Upload Product Raw Material Data Dim\OLE DB Source"
+          TopLeft="265,67" />
+        <NodeLayout
+          Size="171,42"
+          Id="Package\Upload Product Raw Material Data Dim\OLE DB Destination"
+          TopLeft="249,171" />
+        <EdgeLayout
+          Id="Package\Upload Product Raw Material Data Dim.Paths[OLE DB Source Output]"
+          TopLeft="337.25,109">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,62"
+              Start="0,0"
+              End="0,54.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,54.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </TaskHost>
+  <PipelineComponentMetadata
+    design-time-name="Package\Upload Product Raw Material Data Dim\OLE DB Source">
     <Properties>
       <Property>
         <Name>DataSourceViewID</Name>

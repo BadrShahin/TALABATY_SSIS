@@ -11,8 +11,8 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="StageAreaPackage"
   DTS:PackageType="5"
-  DTS:VersionBuild="61"
-  DTS:VersionGUID="{3BFA35ED-27CA-4419-934E-F6A5AD95F550}">
+  DTS:VersionBuild="64"
+  DTS:VersionGUID="{92FDC424-2BF1-446D-BCF7-5DC6C386684B}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -1412,7 +1412,7 @@
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Delete App Version Data"
-      DTS:ThreadHint="6">
+      DTS:ThreadHint="1">
       <DTS:Variables />
       <DTS:LoggingOptions
         DTS:FilterKind="0" />
@@ -1430,7 +1430,7 @@
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Delete Category Data"
-      DTS:ThreadHint="0">
+      DTS:ThreadHint="3">
       <DTS:Variables />
       <DTS:LoggingOptions
         DTS:FilterKind="0" />
@@ -1448,7 +1448,7 @@
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Delete Files Data"
-      DTS:ThreadHint="7">
+      DTS:ThreadHint="4">
       <DTS:Variables />
       <DTS:LoggingOptions
         DTS:FilterKind="0" />
@@ -1466,7 +1466,7 @@
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Delete Message Data"
-      DTS:ThreadHint="1">
+      DTS:ThreadHint="2">
       <DTS:Variables />
       <DTS:LoggingOptions
         DTS:FilterKind="0" />
@@ -1484,7 +1484,7 @@
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Delete Order Message Data"
-      DTS:ThreadHint="1">
+      DTS:ThreadHint="2">
       <DTS:Variables />
       <DTS:LoggingOptions
         DTS:FilterKind="0" />
@@ -1502,14 +1502,14 @@
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Delete Orders Data"
-      DTS:ThreadHint="2">
+      DTS:ThreadHint="3">
       <DTS:Variables />
       <DTS:LoggingOptions
         DTS:FilterKind="0" />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
           SQLTask:Connection="{6F8D547F-F05A-4362-89E7-FFC8018A43DE}"
-          SQLTask:SqlStatementSource="DELETE FROM FACTORDERS" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+          SQLTask:SqlStatementSource="DELETE FROM DIMORDERS" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
     <DTS:Executable
@@ -1520,7 +1520,7 @@
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Delete Permission Data"
-      DTS:ThreadHint="3">
+      DTS:ThreadHint="5">
       <DTS:Variables />
       <DTS:LoggingOptions
         DTS:FilterKind="0" />
@@ -1538,7 +1538,7 @@
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Delete Product Data"
-      DTS:ThreadHint="0">
+      DTS:ThreadHint="3">
       <DTS:Variables />
       <DTS:LoggingOptions
         DTS:FilterKind="0" />
@@ -1563,7 +1563,7 @@
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
           SQLTask:Connection="{6F8D547F-F05A-4362-89E7-FFC8018A43DE}"
-          SQLTask:SqlStatementSource="DELETE FROM FACTPRODUCTRAWMATERIAL" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+          SQLTask:SqlStatementSource="DELETE FROM DIMPRODUCTRAWMATERIAL" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
     <DTS:Executable
@@ -1574,7 +1574,7 @@
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Delete Raw Material Data"
-      DTS:ThreadHint="5">
+      DTS:ThreadHint="0">
       <DTS:Variables />
       <DTS:LoggingOptions
         DTS:FilterKind="0" />
@@ -1592,7 +1592,7 @@
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Delete Role Permission Data"
-      DTS:ThreadHint="3">
+      DTS:ThreadHint="5">
       <DTS:Variables />
       <DTS:LoggingOptions
         DTS:FilterKind="0" />
@@ -1610,7 +1610,7 @@
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Delete Roles Data"
-      DTS:ThreadHint="1">
+      DTS:ThreadHint="2">
       <DTS:Variables />
       <DTS:LoggingOptions
         DTS:FilterKind="0" />
@@ -1628,7 +1628,7 @@
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Delete Unit Data"
-      DTS:ThreadHint="5">
+      DTS:ThreadHint="0">
       <DTS:Variables />
       <DTS:LoggingOptions
         DTS:FilterKind="0" />
@@ -1646,7 +1646,7 @@
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Delete User Data"
-      DTS:ThreadHint="1">
+      DTS:ThreadHint="2">
       <DTS:Variables />
       <DTS:LoggingOptions
         DTS:FilterKind="0" />
@@ -1664,7 +1664,7 @@
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Delete User Token Data"
-      DTS:ThreadHint="4">
+      DTS:ThreadHint="6">
       <DTS:Variables />
       <DTS:LoggingOptions
         DTS:FilterKind="0" />
@@ -4291,7 +4291,7 @@ FROM orders</property>
                 <property
                   dataType="System.String"
                   description="Specifies the name of the database object used to open a rowset."
-                  name="OpenRowset">[dbo].[FactOrders]</property>
+                  name="OpenRowset">[dbo].[DimOrders]</property>
                 <property
                   dataType="System.String"
                   description="Specifies the variable that contains the name of the database object used to open a rowset."
@@ -6229,7 +6229,7 @@ FROM product_rawmaterial</property>
                 <property
                   dataType="System.String"
                   description="Specifies the name of the database object used to open a rowset."
-                  name="OpenRowset">[dbo].[FactProductRawMaterial]</property>
+                  name="OpenRowset">[dbo].[DimProductRawMaterial]</property>
                 <property
                   dataType="System.String"
                   description="Specifies the variable that contains the name of the database object used to open a rowset."
@@ -11049,6 +11049,10 @@ FROM user_tokens</property>
       <GraphLayout
         Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
+          Size="143,42"
+          Id="Package\Upload App Version Data\Handel Errors"
+          TopLeft="377,297" />
+        <NodeLayout
           Size="309,42"
           Id="Package\Upload App Version Data\Upload App Version Data from app_version table"
           TopLeft="290,72" />
@@ -11075,13 +11079,11 @@ FROM user_tokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="143,42"
-          Id="Package\Upload App Version Data\Handel Errors"
-          TopLeft="377,297" />
         <EdgeLayout
           Id="Package\Upload App Version Data.Paths[OLE DB Destination Error Output]"
           TopLeft="448.75,222">
@@ -11136,6 +11138,10 @@ FROM user_tokens</property>
       <GraphLayout
         Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
+          Size="143,42"
+          Id="Package\Upload Category Data\Handel Errors"
+          TopLeft="316,260" />
+        <NodeLayout
           Size="182,42"
           Id="Package\Upload Category Data\Upload Category Data"
           TopLeft="302,78" />
@@ -11162,13 +11168,11 @@ FROM user_tokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="143,42"
-          Id="Package\Upload Category Data\Handel Errors"
-          TopLeft="316,260" />
         <EdgeLayout
           Id="Package\Upload Category Data.Paths[OLE DB Destination Error Output]"
           TopLeft="389.25,206">
@@ -11227,35 +11231,13 @@ FROM user_tokens</property>
           Id="Package\Upload Files Data\Upload Files Data to DimFiles"
           TopLeft="343,151" />
         <NodeLayout
-          Size="235,42"
-          Id="Package\Upload Files Data\Upload Files Data from files table"
-          TopLeft="336,59" />
-        <EdgeLayout
-          Id="Package\Upload Files Data.Paths[ADO NET Source Output]"
-          TopLeft="452.5,101">
-          <EdgeLayout.Curve>
-            <mssgle:Curve
-              StartConnector="{assembly:Null}"
-              EndConnector="0,50"
-              Start="0,0"
-              End="0,42.5">
-              <mssgle:Curve.Segments>
-                <mssgle:SegmentCollection
-                  Capacity="5">
-                  <mssgle:LineSegment
-                    End="0,42.5" />
-                </mssgle:SegmentCollection>
-              </mssgle:Curve.Segments>
-            </mssgle:Curve>
-          </EdgeLayout.Curve>
-          <EdgeLayout.Labels>
-            <EdgeLabelCollection />
-          </EdgeLayout.Labels>
-        </EdgeLayout>
-        <NodeLayout
           Size="143,42"
           Id="Package\Upload Files Data\Handel Errors"
           TopLeft="383,307" />
+        <NodeLayout
+          Size="235,42"
+          Id="Package\Upload Files Data\Upload Files Data from files table"
+          TopLeft="336,59" />
         <NodeLayout
           Size="156,42"
           Id="Package\Upload Files Data\Data Conversion"
@@ -11303,20 +11285,38 @@ FROM user_tokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Upload Files Data.Paths[ADO NET Source Output]"
+          TopLeft="452.5,101">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,50"
+              Start="0,0"
+              End="0,42.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,42.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
     </LayoutInfo>
   </TaskHost>
-  <PipelineComponentMetadata
-    design-time-name="Package\Upload Files Data\Upload Files Data from files table">
-    <Properties>
-      <Property>
-        <Name>DataSourceViewID</Name>
-      </Property>
-    </Properties>
-  </PipelineComponentMetadata>
   <PipelineComponentMetadata
     design-time-name="Package\Upload Files Data\Upload Files Data to DimFiles">
     <Properties>
@@ -11327,6 +11327,14 @@ FROM user_tokens</property>
         <Name>TableInfoObjectType</Name>
         <Value
           type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\Upload Files Data\Upload Files Data from files table">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
       </Property>
     </Properties>
   </PipelineComponentMetadata>
@@ -11343,6 +11351,10 @@ FROM user_tokens</property>
           Size="256,42"
           Id="Package\Upload Message Data\Upload Message Data to DimMessage"
           TopLeft="299,180" />
+        <NodeLayout
+          Size="143,42"
+          Id="Package\Upload Message Data\Handel Errors"
+          TopLeft="360,281" />
         <EdgeLayout
           Id="Package\Upload Message Data.Paths[ADO NET Source Output]"
           TopLeft="429.75,124">
@@ -11362,13 +11374,11 @@ FROM user_tokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="143,42"
-          Id="Package\Upload Message Data\Handel Errors"
-          TopLeft="360,281" />
         <EdgeLayout
           Id="Package\Upload Message Data.Paths[OLE DB Destination Error Output]"
           TopLeft="429.25,222">
@@ -11423,6 +11433,10 @@ FROM user_tokens</property>
       <GraphLayout
         Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
+          Size="143,42"
+          Id="Package\Upload Orders Data\Handel Errors"
+          TopLeft="373,262" />
+        <NodeLayout
           Size="239,42"
           Id="Package\Upload Orders Data\Upload Orders Data to FactOrders"
           TopLeft="329,167" />
@@ -11452,10 +11466,6 @@ FROM user_tokens</property>
             <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="143,42"
-          Id="Package\Upload Orders Data\Handel Errors"
-          TopLeft="373,262" />
         <EdgeLayout
           Id="Package\Upload Orders Data.Paths[OLE DB Destination Error Output]"
           TopLeft="446.5,209">
@@ -11484,14 +11494,6 @@ FROM user_tokens</property>
     </LayoutInfo>
   </TaskHost>
   <PipelineComponentMetadata
-    design-time-name="Package\Upload Orders Data\Upload Orders Data from orders table">
-    <Properties>
-      <Property>
-        <Name>DataSourceViewID</Name>
-      </Property>
-    </Properties>
-  </PipelineComponentMetadata>
-  <PipelineComponentMetadata
     design-time-name="Package\Upload Orders Data\Upload Orders Data to FactOrders">
     <Properties>
       <Property>
@@ -11501,6 +11503,14 @@ FROM user_tokens</property>
         <Name>TableInfoObjectType</Name>
         <Value
           type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\Upload Orders Data\Upload Orders Data from orders table">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
       </Property>
     </Properties>
   </PipelineComponentMetadata>
@@ -11517,6 +11527,10 @@ FROM user_tokens</property>
           Size="352,42"
           Id="Package\Upload Orders Message Data\Upload Orders Message Data from orders_messages table"
           TopLeft="322,67" />
+        <NodeLayout
+          Size="143,42"
+          Id="Package\Upload Orders Message Data\Handel Errors"
+          TopLeft="422,282" />
         <EdgeLayout
           Id="Package\Upload Orders Message Data.Paths[ADO NET Source Output]"
           TopLeft="498.75,109">
@@ -11536,13 +11550,11 @@ FROM user_tokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="143,42"
-          Id="Package\Upload Orders Message Data\Handel Errors"
-          TopLeft="422,282" />
         <EdgeLayout
           Id="Package\Upload Orders Message Data.Paths[OLE DB Destination Error Output]"
           TopLeft="496.5,228">
@@ -11571,14 +11583,6 @@ FROM user_tokens</property>
     </LayoutInfo>
   </TaskHost>
   <PipelineComponentMetadata
-    design-time-name="Package\Upload Orders Message Data\Upload Orders Message Data from orders_messages table">
-    <Properties>
-      <Property>
-        <Name>DataSourceViewID</Name>
-      </Property>
-    </Properties>
-  </PipelineComponentMetadata>
-  <PipelineComponentMetadata
     design-time-name="Package\Upload Orders Message Data\Upload Orders Message Data to DimOrdersMessages">
     <Properties>
       <Property>
@@ -11591,11 +11595,23 @@ FROM user_tokens</property>
       </Property>
     </Properties>
   </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\Upload Orders Message Data\Upload Orders Message Data from orders_messages table">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
   <TaskHost
     design-time-name="Package\Upload Permission Data">
     <LayoutInfo>
       <GraphLayout
         Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        <NodeLayout
+          Size="143,42"
+          Id="Package\Upload Permission Data\Handel Errors"
+          TopLeft="343,232" />
         <NodeLayout
           Size="301,42"
           Id="Package\Upload Permission Data\Upload Permission Data from permissions table"
@@ -11623,13 +11639,11 @@ FROM user_tokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="143,42"
-          Id="Package\Upload Permission Data\Handel Errors"
-          TopLeft="343,232" />
         <EdgeLayout
           Id="Package\Upload Permission Data.Paths[OLE DB Destination Error Output]"
           TopLeft="412.5,177">
@@ -11684,13 +11698,17 @@ FROM user_tokens</property>
       <GraphLayout
         Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
-          Size="207,42"
-          Id="Package\Upload Product Data\Upload Data to DimProduct"
-          TopLeft="256,179" />
-        <NodeLayout
           Size="267,42"
           Id="Package\Upload Product Data\Upload Product Data from product table"
           TopLeft="223,80" />
+        <NodeLayout
+          Size="143,42"
+          Id="Package\Upload Product Data\Handel Errors"
+          TopLeft="287,265" />
+        <NodeLayout
+          Size="207,42"
+          Id="Package\Upload Product Data\Upload Data to DimProduct"
+          TopLeft="256,179" />
         <EdgeLayout
           Id="Package\Upload Product Data.Paths[ADO NET Source Output]"
           TopLeft="358,122">
@@ -11710,13 +11728,11 @@ FROM user_tokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="143,42"
-          Id="Package\Upload Product Data\Handel Errors"
-          TopLeft="287,265" />
         <EdgeLayout
           Id="Package\Upload Product Data.Paths[OLE DB Destination Error Output]"
           TopLeft="359,221">
@@ -11745,6 +11761,14 @@ FROM user_tokens</property>
     </LayoutInfo>
   </TaskHost>
   <PipelineComponentMetadata
+    design-time-name="Package\Upload Product Data\Upload Product Data from product table">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <PipelineComponentMetadata
     design-time-name="Package\Upload Product Data\Upload Data to DimProduct">
     <Properties>
       <Property>
@@ -11757,14 +11781,6 @@ FROM user_tokens</property>
       </Property>
     </Properties>
   </PipelineComponentMetadata>
-  <PipelineComponentMetadata
-    design-time-name="Package\Upload Product Data\Upload Product Data from product table">
-    <Properties>
-      <Property>
-        <Name>DataSourceViewID</Name>
-      </Property>
-    </Properties>
-  </PipelineComponentMetadata>
   <TaskHost
     design-time-name="Package\Upload Product Raw Material Data">
     <LayoutInfo>
@@ -11774,6 +11790,10 @@ FROM user_tokens</property>
           Size="171,42"
           Id="Package\Upload Product Raw Material Data\OLE DB Destination"
           TopLeft="293,154" />
+        <NodeLayout
+          Size="143,42"
+          Id="Package\Upload Product Raw Material Data\Handel Errors"
+          TopLeft="310,246" />
         <NodeLayout
           Size="158,42"
           Id="Package\Upload Product Raw Material Data\ADO NET Source"
@@ -11800,10 +11820,6 @@ FROM user_tokens</property>
             <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="143,42"
-          Id="Package\Upload Product Raw Material Data\Handel Errors"
-          TopLeft="310,246" />
         <EdgeLayout
           Id="Package\Upload Product Raw Material Data.Paths[OLE DB Destination Error Output]"
           TopLeft="380,196">
@@ -11832,14 +11848,6 @@ FROM user_tokens</property>
     </LayoutInfo>
   </TaskHost>
   <PipelineComponentMetadata
-    design-time-name="Package\Upload Product Raw Material Data\ADO NET Source">
-    <Properties>
-      <Property>
-        <Name>DataSourceViewID</Name>
-      </Property>
-    </Properties>
-  </PipelineComponentMetadata>
-  <PipelineComponentMetadata
     design-time-name="Package\Upload Product Raw Material Data\OLE DB Destination">
     <Properties>
       <Property>
@@ -11852,19 +11860,31 @@ FROM user_tokens</property>
       </Property>
     </Properties>
   </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\Upload Product Raw Material Data\ADO NET Source">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
   <TaskHost
     design-time-name="Package\Upload Raw Material Data">
     <LayoutInfo>
       <GraphLayout
         Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
+          Size="171,42"
+          Id="Package\Upload Raw Material Data\OLE DB Destination"
+          TopLeft="336,172" />
+        <NodeLayout
           Size="201,42"
           Id="Package\Upload Raw Material Data\Upload Raw Material Data"
           TopLeft="319,60" />
         <NodeLayout
-          Size="171,42"
-          Id="Package\Upload Raw Material Data\OLE DB Destination"
-          TopLeft="336,172" />
+          Size="143,42"
+          Id="Package\Upload Raw Material Data\Handel Errors"
+          TopLeft="353,287" />
         <EdgeLayout
           Id="Package\Upload Raw Material Data.Paths[ADO NET Source Output]"
           TopLeft="420.5,102">
@@ -11884,13 +11904,11 @@ FROM user_tokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="143,42"
-          Id="Package\Upload Raw Material Data\Handel Errors"
-          TopLeft="353,287" />
         <EdgeLayout
           Id="Package\Upload Raw Material Data.Paths[OLE DB Destination Error Output]"
           TopLeft="423,214">
@@ -11952,6 +11970,10 @@ FROM user_tokens</property>
           Size="353,42"
           Id="Package\Upload Role Permission Data\Upload Role Permission Data from roles_permissions table"
           TopLeft="252,64" />
+        <NodeLayout
+          Size="143,42"
+          Id="Package\Upload Role Permission Data\Handel Errors"
+          TopLeft="359,276" />
         <EdgeLayout
           Id="Package\Upload Role Permission Data.Paths[ADO NET Source Output]"
           TopLeft="430.25,106">
@@ -11971,13 +11993,11 @@ FROM user_tokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="143,42"
-          Id="Package\Upload Role Permission Data\Handel Errors"
-          TopLeft="359,276" />
         <EdgeLayout
           Id="Package\Upload Role Permission Data.Paths[OLE DB Destination Error Output]"
           TopLeft="431.25,211">
@@ -12006,14 +12026,6 @@ FROM user_tokens</property>
     </LayoutInfo>
   </TaskHost>
   <PipelineComponentMetadata
-    design-time-name="Package\Upload Role Permission Data\Upload Role Permission Data from roles_permissions table">
-    <Properties>
-      <Property>
-        <Name>DataSourceViewID</Name>
-      </Property>
-    </Properties>
-  </PipelineComponentMetadata>
-  <PipelineComponentMetadata
     design-time-name="Package\Upload Role Permission Data\Upload Role Permission Data to DimRolePermission">
     <Properties>
       <Property>
@@ -12023,6 +12035,14 @@ FROM user_tokens</property>
         <Name>TableInfoObjectType</Name>
         <Value
           type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\Upload Role Permission Data\Upload Role Permission Data from roles_permissions table">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
       </Property>
     </Properties>
   </PipelineComponentMetadata>
@@ -12039,6 +12059,10 @@ FROM user_tokens</property>
           Size="243,42"
           Id="Package\Upload Roles Data\Upload Roles Data from roles table"
           TopLeft="327,75" />
+        <NodeLayout
+          Size="143,42"
+          Id="Package\Upload Roles Data\Handel Errors"
+          TopLeft="375,267" />
         <EdgeLayout
           Id="Package\Upload Roles Data.Paths[ADO NET Source Output]"
           TopLeft="448,117">
@@ -12058,13 +12082,11 @@ FROM user_tokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="143,42"
-          Id="Package\Upload Roles Data\Handel Errors"
-          TopLeft="375,267" />
         <EdgeLayout
           Id="Package\Upload Roles Data.Paths[OLE DB Destination Error Output]"
           TopLeft="447,215">
@@ -12093,14 +12115,6 @@ FROM user_tokens</property>
     </LayoutInfo>
   </TaskHost>
   <PipelineComponentMetadata
-    design-time-name="Package\Upload Roles Data\Upload Roles Data from roles table">
-    <Properties>
-      <Property>
-        <Name>DataSourceViewID</Name>
-      </Property>
-    </Properties>
-  </PipelineComponentMetadata>
-  <PipelineComponentMetadata
     design-time-name="Package\Upload Roles Data\Upload Roles Data to DimRoles">
     <Properties>
       <Property>
@@ -12113,11 +12127,23 @@ FROM user_tokens</property>
       </Property>
     </Properties>
   </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\Upload Roles Data\Upload Roles Data from roles table">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
   <TaskHost
     design-time-name="Package\Upload Unit Data">
     <LayoutInfo>
       <GraphLayout
         Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        <NodeLayout
+          Size="143,42"
+          Id="Package\Upload Unit Data\Handel Errors"
+          TopLeft="357,287" />
         <NodeLayout
           Size="191,42"
           Id="Package\Upload Unit Data\Upload Data to DimUnit"
@@ -12145,13 +12171,11 @@ FROM user_tokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="143,42"
-          Id="Package\Upload Unit Data\Handel Errors"
-          TopLeft="357,287" />
         <EdgeLayout
           Id="Package\Upload Unit Data.Paths[OLE DB Destination Error Output]"
           TopLeft="427.5,232">
@@ -12206,13 +12230,17 @@ FROM user_tokens</property>
       <GraphLayout
         Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
-          Size="217,42"
-          Id="Package\Upload User Data\Upload User Data to DimUser"
-          TopLeft="360,158" />
-        <NodeLayout
           Size="237,42"
           Id="Package\Upload User Data\Upload User Data from user table"
           TopLeft="347,67" />
+        <NodeLayout
+          Size="143,42"
+          Id="Package\Upload User Data\Handel Errors"
+          TopLeft="396,252" />
+        <NodeLayout
+          Size="217,42"
+          Id="Package\Upload User Data\Upload User Data to DimUser"
+          TopLeft="360,158" />
         <EdgeLayout
           Id="Package\Upload User Data.Paths[ADO NET Source Output]"
           TopLeft="467,109">
@@ -12232,13 +12260,11 @@ FROM user_tokens</property>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="143,42"
-          Id="Package\Upload User Data\Handel Errors"
-          TopLeft="396,252" />
         <EdgeLayout
           Id="Package\Upload User Data.Paths[OLE DB Destination Error Output]"
           TopLeft="468,200">
@@ -12297,35 +12323,13 @@ FROM user_tokens</property>
           Id="Package\Upload User Tokens Data\Upload User Tokens Data to DimUserTokens"
           TopLeft="281,170" />
         <NodeLayout
-          Size="311,42"
-          Id="Package\Upload User Tokens Data\Upload User Tokens Data from user_tokens table"
-          TopLeft="267,89" />
-        <EdgeLayout
-          Id="Package\Upload User Tokens Data.Paths[ADO NET Source Output]"
-          TopLeft="423.75,131">
-          <EdgeLayout.Curve>
-            <mssgle:Curve
-              StartConnector="{assembly:Null}"
-              EndConnector="0,39"
-              Start="0,0"
-              End="0,31.5">
-              <mssgle:Curve.Segments>
-                <mssgle:SegmentCollection
-                  Capacity="5">
-                  <mssgle:LineSegment
-                    End="0,31.5" />
-                </mssgle:SegmentCollection>
-              </mssgle:Curve.Segments>
-            </mssgle:Curve>
-          </EdgeLayout.Curve>
-          <EdgeLayout.Labels>
-            <EdgeLabelCollection />
-          </EdgeLayout.Labels>
-        </EdgeLayout>
-        <NodeLayout
           Size="143,42"
           Id="Package\Upload User Tokens Data\Handel Errors"
           TopLeft="353,257" />
+        <NodeLayout
+          Size="311,42"
+          Id="Package\Upload User Tokens Data\Upload User Tokens Data from user_tokens table"
+          TopLeft="267,89" />
         <EdgeLayout
           Id="Package\Upload User Tokens Data.Paths[OLE DB Destination Error Output]"
           TopLeft="424.75,212">
@@ -12350,17 +12354,33 @@ FROM user_tokens</property>
               RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Upload User Tokens Data.Paths[ADO NET Source Output]"
+          TopLeft="423.75,131">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,39"
+              Start="0,0"
+              End="0,31.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,31.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
       </GraphLayout>
     </LayoutInfo>
   </TaskHost>
-  <PipelineComponentMetadata
-    design-time-name="Package\Upload User Tokens Data\Upload User Tokens Data from user_tokens table">
-    <Properties>
-      <Property>
-        <Name>DataSourceViewID</Name>
-      </Property>
-    </Properties>
-  </PipelineComponentMetadata>
   <PipelineComponentMetadata
     design-time-name="Package\Upload User Tokens Data\Upload User Tokens Data to DimUserTokens">
     <Properties>
@@ -12371,6 +12391,14 @@ FROM user_tokens</property>
         <Name>TableInfoObjectType</Name>
         <Value
           type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\Upload User Tokens Data\Upload User Tokens Data from user_tokens table">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
       </Property>
     </Properties>
   </PipelineComponentMetadata>
