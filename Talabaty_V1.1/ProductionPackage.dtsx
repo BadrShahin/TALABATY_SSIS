@@ -11,8 +11,8 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="ProductionPackage"
   DTS:PackageType="5"
-  DTS:VersionBuild="151"
-  DTS:VersionGUID="{DCFB05C2-6CA9-4637-B51E-CEF5B251B504}">
+  DTS:VersionBuild="168"
+  DTS:VersionGUID="{EBECCD4B-05CD-40BB-9347-28FEBF325D2C}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -1200,23 +1200,23 @@ FROM DB_Talabaty_Production.dbo.DimCategory</property>
                   name="SqlCommand"
                   UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor, Microsoft.DataTransformationServices.Controls, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91">SELECT      
 	DISTINCT CAST(Created_At AS date) AS DATE , 
-	DAY(Created_At) AS DAY, 
-	MONTH(Created_At) AS MONTH, 
+	RIGHT('00' + CONVERT(NVARCHAR(2), DATEPART(DAY, Created_At)), 2) AS DAY, 
+	RIGHT('00' + CONVERT(NVARCHAR(2), DATEPART(MONTH, Created_At)), 2) AS MONTH, 
 	DATENAME(MM, Created_At) AS MONTHNAME , 
 	UPPER(LEFT(DATENAME(MM, Created_At), 3))  AS MONTHNAME_SHORT, 
-	DATEPART(Q, Created_At) AS QUARTER, 
+	RIGHT('00' + CONVERT(NVARCHAR(2), DATEPART(Q, Created_At)), 2) AS QUARTER, 
 	CASE 
-		WHEN DATEPART(QQ, Created_At) = 1 
+		WHEN DATEPART(QQ, Created_At) = 01 
 			THEN 'First'
-		WHEN DATEPART(QQ, Created_At) = 2 
+		WHEN DATEPART(QQ, Created_At) = 02 
 			THEN 'Second'
-		WHEN DATEPART(QQ, Created_At) = 3
+		WHEN DATEPART(QQ, Created_At) = 03
 			THEN 'Third'
-		WHEN DATEPART(QQ, Created_At) = 4
+		WHEN DATEPART(QQ, Created_At) = 04
 			THEN 'Fourth' 
 	END AS QUARTERNAME, 
 	YEAR(Created_At) AS YEAR
-FROM DB_Talabaty_Production.dbo.DimOrders
+FROM DB_Talabaty_Production.dbo.FactOrders
 
 EXCEPT 
 
@@ -1342,11 +1342,11 @@ FROM DB_Talabaty_Production.dbo.DimDate</property>
                       name="DATE" />
                     <externalMetadataColumn
                       refId="Package\Upload Date Data\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[DAY]"
-                      dataType="i4"
+                      dataType="ui1"
                       name="DAY" />
                     <externalMetadataColumn
                       refId="Package\Upload Date Data\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[MONTH]"
-                      dataType="i4"
+                      dataType="ui1"
                       name="MONTH" />
                     <externalMetadataColumn
                       refId="Package\Upload Date Data\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[MONTHNAME]"
@@ -1360,7 +1360,7 @@ FROM DB_Talabaty_Production.dbo.DimDate</property>
                       name="MONTHNAME_SHORT" />
                     <externalMetadataColumn
                       refId="Package\Upload Date Data\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[QUARTER]"
-                      dataType="i4"
+                      dataType="ui1"
                       name="QUARTER" />
                     <externalMetadataColumn
                       refId="Package\Upload Date Data\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[QUARTERNAME]"
@@ -1386,12 +1386,12 @@ FROM DB_Talabaty_Production.dbo.DimDate</property>
                       name="DATE" />
                     <outputColumn
                       refId="Package\Upload Date Data\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[DAY]"
-                      dataType="i4"
+                      dataType="ui1"
                       lineageId="Package\Upload Date Data\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[DAY]"
                       name="DAY" />
                     <outputColumn
                       refId="Package\Upload Date Data\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[MONTH]"
-                      dataType="i4"
+                      dataType="ui1"
                       lineageId="Package\Upload Date Data\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[MONTH]"
                       name="MONTH" />
                     <outputColumn
@@ -1408,7 +1408,7 @@ FROM DB_Talabaty_Production.dbo.DimDate</property>
                       name="MONTHNAME_SHORT" />
                     <outputColumn
                       refId="Package\Upload Date Data\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[QUARTER]"
-                      dataType="i4"
+                      dataType="ui1"
                       lineageId="Package\Upload Date Data\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[QUARTER]"
                       name="QUARTER" />
                     <outputColumn
@@ -1627,13 +1627,30 @@ FROM DB_Talabaty_Production.dbo.DimDate</property>
                   dataType="System.String"
                   description="The SQL command to be executed."
                   name="SqlCommand"
-                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor, Microsoft.DataTransformationServices.Controls, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91">SELECT SUB2."Order", SUB2."Raw Material", SUB2.Employee, SUB2.Performer, SUB2.Product, SUB2.Category, SUB2.Unit, SUB2.Date, SUB2.Quantity, SUB2.Consumption, ((SUB2.Quantity * SUB2.Sell_Unit_Price )) AS 'Consumed Material Expenses'
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor, Microsoft.DataTransformationServices.Controls, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91">SELECT SUB2."Raw Material", SUB2.Employee, SUB2.Performer, SUB2.Product, SUB2.Category, SUB2.Unit, SUB2.Date, SUB2.Quantity, SUB2.Consumption,
+		CASE 
+			WHEN SUB2.UNIT = 9 
+				THEN (SUB2.Consumption * SUB2.Buy_Unit_Price )
+				ELSE (SUB2.Consumption * SUB2.Sell_Unit_Price )
+			END AS 'Consumed Material Expenses'
 FROM (	
-	SELECT SUB1."Order", SUB1.Employee, SUB1.Performer, SUB1.Product, SUB1.Category, SUB1."Raw Material", SUB1.Buy_Unit_Price, SUB1.Sell_Unit_Price, SUB1.Unit, SUB1.Date, SUB1.Quantity, ((SUB1.Quantity * SUB1.Raw_Material_Unit_Number) /CAST(SUB1.Units_Number AS decimal(9,2))) AS 'Consumption'
+	SELECT SUB1.Employee, SUB1.Performer, SUB1.Product, SUB1.Category, SUB1."Raw Material", SUB1.Buy_Unit_Price, SUB1.Sell_Unit_Price,
+			CASE
+					WHEN SUB1.[Sell Unit ID] = 1 OR SUB1.[Sell Unit ID] = 3 THEN SUB1.[Buy Unit ID]
+					ELSE SUB1.[Sell Unit ID]
+				END AS 'UNIT'
+			, SUB1.Date, SUB1.Quantity,
+			CASE
+				 WHEN SUB1.[Sell Unit ID] = 1 OR SUB1.[Sell Unit ID] = 3 
+					THEN (CAST((SUB1.Quantity * SUB1.Raw_Material_Unit_Number )as decimal(7,2) ) / SUB1.Units_Number)
+				 ELSE 
+					CAST((SUB1.Quantity * SUB1.Raw_Material_Unit_Number )as decimal(7,2))
+			END AS 'Consumption'
 	FROM (
-		SELECT DO.ID AS "Order", U.ID AS 'Employee', Performer.ID AS 'Performer', P.ID AS 'Product', C.ID AS 'Category', RM.ID AS 'Raw Material', RM.Units_Number, RM.Buy_Unit_Price, RM.Sell_Unit_Price,
-				DPRM.Raw_Material_Unit_Number, UN.ID AS 'Unit', DD.DateKey AS 'Date', SUM(DO.COUNT) AS 'Quantity'
-		FROM DimOrders DO
+		SELECT U.ID AS 'Employee', Performer.ID AS 'Performer', P.ID AS 'Product', C.ID AS 'Category', RM.ID AS 'Raw Material', RM.Units_Number, RM.Buy_Unit_Price, RM.Sell_Unit_Price,
+				DPRM.Raw_Material_Unit_Number, BU.ID AS 'Buy Unit ID',SU.ID AS 'Sell Unit ID'
+				, DD.DateKey AS 'Date', SUM(DO.COUNT) AS 'Quantity'
+		FROM FactOrders DO
 		INNER JOIN DimUser U
 		ON DO.Ordered_By = U.ID
 		INNER JOIN DimUser Performer 
@@ -1646,20 +1663,21 @@ FROM (
 		ON DPRM.Product_Id = P.ID
 		INNER JOIN DimRawMaterial RM
 		ON DPRM.Raw_Material_Id = RM.ID
-		INNER JOIN DimUnit UN
-		ON RM.Buy_Unit_Id = UN.ID
+		INNER JOIN DimUnit BU
+		ON RM.Buy_Unit_Id = BU.ID
+		INNER JOIN DimUnit SU
+		ON RM.Sell_Unit_Id = SU.ID
 		INNER JOIN DimDate DD
 		ON DD.Date = CAST (DO.Created_At AS DATE)
 		WHERE DD.DateKey &gt;= 122
-		GROUP BY DO.ID, U.ID, Performer.ID, P.ID, C.ID, RM.ID, DPRM.Raw_Material_Unit_Number, RM.Units_Number, RM.Buy_Unit_Price, RM.Sell_Unit_Price, UN.ID, DD.DateKey
+		GROUP BY U.ID, Performer.ID, P.ID, C.ID, RM.ID, DPRM.Raw_Material_Unit_Number, RM.Units_Number, RM.Buy_Unit_Price, RM.Sell_Unit_Price, BU.ID, SU.ID, DD.DateKey
 		) SUB1
-		GROUP BY SUB1."Order", SUB1.Employee, SUB1.Performer, SUB1.Product, SUB1.Category, SUB1."Raw Material", SUB1.Buy_Unit_Price, SUB1.Sell_Unit_Price, SUB1.Unit, SUB1.Date, SUB1.Quantity, SUB1.Raw_Material_Unit_Number, SUB1.Units_Number
+		GROUP BY SUB1.Employee, SUB1.Performer, SUB1.Product, SUB1.Category, SUB1."Raw Material", SUB1.Buy_Unit_Price, SUB1.Sell_Unit_Price, SUB1.[Buy Unit ID], SUB1.[Sell Unit ID], SUB1.Date, SUB1.Quantity, SUB1.Raw_Material_Unit_Number, SUB1.Units_Number
 	) SUB2
 
 EXCEPT 
 
-SELECT [Order_id]
-      ,[RawMaterial_ID]
+SELECT [RawMaterial_ID]
 ,[Employee_ID]
       ,[Performer_ID]
       ,[Product_ID]
@@ -1669,7 +1687,7 @@ SELECT [Order_id]
       ,[Quantity]
 ,[Consumption]
 ,[Expenses]
-  FROM [DB_Talabaty_Production].[dbo].[FactOrders]</property>
+  FROM [DB_Talabaty_Production].[dbo].[Test3FactOrders]</property>
                 <property
                   dataType="System.String"
                   description="The variable that contains the SQL command to be executed."
@@ -1795,15 +1813,6 @@ SELECT [Order_id]
                       lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Consumed Material Expenses]"
                       name="Consumed Material Expenses"
                       truncationRowDisposition="FailComponent" />
-                    <outputColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Order]"
-                      dataType="i8"
-                      errorOrTruncationOperation="Conversion"
-                      errorRowDisposition="FailComponent"
-                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].ExternalColumns[Order]"
-                      lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Order]"
-                      name="Order"
-                      truncationRowDisposition="FailComponent" />
                   </outputColumns>
                   <externalMetadataColumns
                     isUsed="True">
@@ -1847,10 +1856,6 @@ SELECT [Order_id]
                       refId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].ExternalColumns[Consumed Material Expenses]"
                       dataType="r8"
                       name="Consumed Material Expenses" />
-                    <externalMetadataColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].ExternalColumns[Order]"
-                      dataType="i8"
-                      name="Order" />
                   </externalMetadataColumns>
                 </output>
                 <output
@@ -1858,11 +1863,6 @@ SELECT [Order_id]
                   isErrorOut="true"
                   name="OLE DB Source Error Output">
                   <outputColumns>
-                    <outputColumn
-                      refId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Error Output].Columns[Order]"
-                      dataType="i8"
-                      lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Error Output].Columns[Order]"
-                      name="Order" />
                     <outputColumn
                       refId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Error Output].Columns[Employee]"
                       dataType="i8"
@@ -1946,7 +1946,7 @@ SELECT [Order_id]
                 <property
                   dataType="System.String"
                   description="Specifies the name of the database object used to open a rowset."
-                  name="OpenRowset">[dbo].[FactOrders]</property>
+                  name="OpenRowset">[dbo].[Test3FactOrders]</property>
                 <property
                   dataType="System.String"
                   description="Specifies the variable that contains the name of the database object used to open a rowset."
@@ -1972,7 +1972,7 @@ SELECT [Order_id]
                 <property
                   dataType="System.Boolean"
                   description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
-                  name="FastLoadKeepIdentity">true</property>
+                  name="FastLoadKeepIdentity">false</property>
                 <property
                   dataType="System.Boolean"
                   description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
@@ -2062,12 +2062,6 @@ SELECT [Order_id]
                       cachedName="Consumed Material Expenses"
                       externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Expenses]"
                       lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Consumed Material Expenses]" />
-                    <inputColumn
-                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].Columns[Order]"
-                      cachedDataType="i8"
-                      cachedName="Order"
-                      externalMetadataColumnId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Order_ID]"
-                      lineageId="Package\Upload Fact Orders Data\Upload Fact Orders Data.Outputs[OLE DB Source Output].Columns[Order]" />
                   </inputColumns>
                   <externalMetadataColumns
                     isUsed="True">
@@ -2112,9 +2106,9 @@ SELECT [Order_id]
                       dataType="r8"
                       name="Expenses" />
                     <externalMetadataColumn
-                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[Order_ID]"
+                      refId="Package\Upload Fact Orders Data\Upload Orders Data to FactOrders.Inputs[OLE DB Destination Input].ExternalColumns[ID]"
                       dataType="i8"
-                      name="Order_ID" />
+                      name="ID" />
                   </externalMetadataColumns>
                 </input>
               </inputs>
@@ -2986,7 +2980,7 @@ FROM DB_Talabaty_Production.dbo.DimMessage</property>
                   dataType="System.String"
                   description="The SQL command to be executed."
                   name="SqlCommand"
-                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor, Microsoft.DataTransformationServices.Controls, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91">MERGE DB_Talabaty_Production.dbo.DimOrders AS PROD_TARGET
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor, Microsoft.DataTransformationServices.Controls, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91">MERGE DB_Talabaty_Production.dbo.FactOrders AS PROD_TARGET
 USING DB_Talabaty_StagingArea.dbo.DimOrders AS STAG_SOURCE
 ON PROD_TARGET.ID = STAG_SOURCE.ID 
 WHEN MATCHED AND 
@@ -3015,7 +3009,7 @@ WHERE DO.Is_Deleted != 1 and cast(DO.Created_at as date) &gt;= cast('2020-10-01'
 EXCEPT 
 
 SELECT * 
-FROM DB_Talabaty_Production.dbo.DimOrders</property>
+FROM DB_Talabaty_Production.dbo.FactOrders</property>
                 <property
                   dataType="System.String"
                   description="The variable that contains the SQL command to be executed."
@@ -3367,7 +3361,7 @@ FROM DB_Talabaty_Production.dbo.DimOrders</property>
                 <property
                   dataType="System.String"
                   description="Specifies the name of the database object used to open a rowset."
-                  name="OpenRowset">[dbo].[DimOrders]</property>
+                  name="OpenRowset">[dbo].[FactOrders]</property>
                 <property
                   dataType="System.String"
                   description="Specifies the variable that contains the name of the database object used to open a rowset."
@@ -8763,7 +8757,7 @@ FROM DB_Talabaty_Production.dbo.DimUserTokens</property>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
             <mssgm:EdgeLabel
-              BoundingBox="-73.20890625,19.033203125,146.4178125,11.43359375"
+              BoundingBox="-81.8700390625,16.75,146.4178125,11.43359375"
               RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
